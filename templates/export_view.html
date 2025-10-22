@@ -7,33 +7,55 @@
     <title>{{ export_type }} Export - KDP Books Price Tracker</title>
     <link rel="stylesheet" href="/static/css/style.css">
     <style>
-        .export-container {
+        .export-view-container {
             max-width: 1400px;
             margin: 0 auto;
             padding: 20px;
         }
-        .export-header {
+        .export-view-header {
+            background: var(--bg-primary);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+        }
+        .export-title-section {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .export-title-section h1 {
+            font-size: 2rem;
+            color: var(--accent-color);
+            margin: 0;
+        }
+        .export-filename {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-top: 10px;
         }
         .export-actions {
             display: flex;
             gap: 10px;
+            flex-wrap: wrap;
+        }
+        .export-content {
+            background: var(--bg-primary);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: var(--shadow);
         }
         .csv-table {
             width: 100%;
             border-collapse: collapse;
-            background: var(--card-bg);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            background: var(--bg-secondary);
             border-radius: 8px;
             overflow: hidden;
         }
         .csv-table thead {
-            background: var(--primary-color);
+            background: var(--accent-color);
             color: white;
         }
         .csv-table th,
@@ -41,38 +63,13 @@
             padding: 12px 15px;
             text-align: left;
             border-bottom: 1px solid var(--border-color);
+            color: var(--text-primary);
         }
         .csv-table tbody tr:hover {
-            background: var(--hover-bg);
+            background: var(--bg-tertiary);
         }
         .csv-table tbody tr:last-child td {
             border-bottom: none;
-        }
-        .btn-download {
-            background: var(--success-color);
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-block;
-        }
-        .btn-download:hover {
-            opacity: 0.9;
-        }
-        .btn-back {
-            background: var(--secondary-color);
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-block;
-        }
-        .btn-back:hover {
-            opacity: 0.9;
         }
         .pdf-viewer {
             width: 100%;
@@ -81,18 +78,32 @@
             border-radius: 8px;
             background: white;
         }
+        @media (max-width: 768px) {
+            .export-title-section {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .export-view-header h1 {
+                font-size: 1.5rem;
+            }
+            .pdf-viewer {
+                height: 500px;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="export-container">
-        <div class="export-header">
-            <div>
-                <h1>📊 {{ export_type }} Export</h1>
-                <p>Filename: {{ filename }}</p>
-            </div>
-            <div class="export-actions">
-                <a href="/" class="btn-back">← Back to Dashboard</a>
-                <a href="/api/export/{{ export_type.lower() }}" class="btn-download" download>⬇️ Download {{ export_type }}</a>
+    <div class="export-view-container">
+        <div class="export-view-header">
+            <div class="export-title-section">
+                <div>
+                    <h1>📊 {{ export_type }} Export</h1>
+                    <p class="export-filename">Filename: {{ filename }}</p>
+                </div>
+                <div class="export-actions">
+                    <a href="/" class="btn btn-secondary">← Back to Dashboard</a>
+                    <a href="/api/export/{{ export_type.lower() }}" class="btn btn-success" download>⬇️ Download {{ export_type }}</a>
+                </div>
             </div>
         </div>
         
@@ -104,5 +115,12 @@
             {% endif %}
         </div>
     </div>
+
+    <script>
+        // Apply dark mode if it was enabled on main app
+        if (localStorage.getItem('darkMode') === 'enabled') {
+            document.body.classList.add('dark-mode');
+        }
+    </script>
 </body>
 </html>
