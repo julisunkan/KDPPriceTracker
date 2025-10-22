@@ -87,12 +87,12 @@ async function loadSampleBooks() {
             thumbnail_url: 'https://books.google.com/books/content?id=kotPYEqx7kMC&printsec=frontcover&img=1&zoom=1'
         }
     ];
-    
+
     // Check if books already exist
     try {
         const response = await fetch('/api/books');
         const data = await response.json();
-        
+
         if (data.books.length === 0) {
             // Add sample books
             for (const book of sampleBooks) {
@@ -115,28 +115,28 @@ function initEventListeners() {
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', () => switchTab(btn.dataset.tab));
     });
-    
+
     document.getElementById('searchBtn').addEventListener('click', searchBooks);
     document.getElementById('searchInput').addEventListener('keypress', (e) => {
         if (e.key === 'Enter') searchBooks();
     });
-    
+
     document.getElementById('filterInput').addEventListener('input', (e) => {
         filterBooks(e.target.value);
     });
-    
+
     document.getElementById('darkModeToggle').addEventListener('click', toggleDarkMode);
-    
+
     document.getElementById('notificationBtn').addEventListener('click', toggleNotificationPanel);
-    
+
     document.getElementById('createWatchlistBtn').addEventListener('click', () => {
         openModal('createWatchlistModal');
     });
-    
+
     document.getElementById('saveWatchlistBtn').addEventListener('click', createWatchlist);
-    
+
     document.getElementById('calculateBtn').addEventListener('click', calculateProfit);
-    
+
     document.getElementById('formatSelect').addEventListener('change', (e) => {
         if (e.target.value === 'ebook') {
             document.getElementById('ebookOptions').style.display = 'block';
@@ -146,15 +146,15 @@ function initEventListeners() {
             document.getElementById('paperbackOptions').style.display = 'block';
         }
     });
-    
+
     document.getElementById('exportCSV').addEventListener('click', () => {
         window.location.href = '/api/export/csv';
     });
-    
+
     document.getElementById('exportPDF').addEventListener('click', () => {
         window.location.href = '/api/export/pdf';
     });
-    
+
     document.querySelectorAll('.close').forEach(closeBtn => {
         closeBtn.addEventListener('click', function() {
             const modal = this.closest('.modal');
@@ -163,7 +163,7 @@ function initEventListeners() {
             if (panel) panel.classList.remove('open');
         });
     });
-    
+
     window.addEventListener('click', (e) => {
         if (e.target.classList.contains('modal')) {
             e.target.style.display = 'none';
@@ -174,10 +174,10 @@ function initEventListeners() {
 function switchTab(tabName) {
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
     document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-    
+
     document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
     document.getElementById(tabName).classList.add('active');
-    
+
     if (tabName === 'watchlists') {
         loadWatchlists();
     }
@@ -187,7 +187,7 @@ async function loadStats() {
     try {
         const response = await fetch('/api/stats');
         const data = await response.json();
-        
+
         document.getElementById('totalBooks').textContent = data.total_books;
         document.getElementById('avgPrice').textContent = `$${data.avg_price.toFixed(2)}`;
         document.getElementById('avgRating').textContent = data.avg_rating.toFixed(1);
@@ -201,7 +201,7 @@ async function loadBooks() {
     try {
         const response = await fetch('/api/books');
         const data = await response.json();
-        
+
         displayBooks(data.books);
     } catch (error) {
         console.error('Error loading books:', error);
@@ -210,7 +210,7 @@ async function loadBooks() {
 
 function displayBooks(books) {
     const container = document.getElementById('booksList');
-    
+
     if (books.length === 0) {
         container.innerHTML = `
             <div class="empty-state">
@@ -220,7 +220,7 @@ function displayBooks(books) {
         `;
         return;
     }
-    
+
     container.innerHTML = books.map(book => `
         <div class="book-card" data-book-id="${book.id}" data-title="${book.title.toLowerCase()}" data-author="${book.author.toLowerCase()}">
             <div class="book-header">
@@ -233,13 +233,13 @@ function displayBooks(books) {
                     <div class="book-author">by ${book.author}</div>
                 </div>
             </div>
-            
+
             <div class="book-meta">
                 ${book.current_price ? `<span class="price-tag">$${book.current_price.toFixed(2)}</span>` : ''}
                 ${book.rating ? `<span class="rating-tag">⭐ ${book.rating.toFixed(1)}</span>` : ''}
                 ${book.page_count ? `<span class="meta-item">${book.page_count} pages</span>` : ''}
             </div>
-            
+
             <div class="book-actions">
                 <button class="action-btn btn-primary" onclick="viewBookDetails(${book.id})">View Details</button>
                 <button class="action-btn btn-danger" onclick="deleteBook(${book.id})">Delete</button>
@@ -251,11 +251,11 @@ function displayBooks(books) {
 function filterBooks(query) {
     const books = document.querySelectorAll('.book-card');
     const lowerQuery = query.toLowerCase();
-    
+
     books.forEach(book => {
         const title = book.dataset.title;
         const author = book.dataset.author;
-        
+
         if (title.includes(lowerQuery) || author.includes(lowerQuery)) {
             book.style.display = 'block';
         } else {
@@ -267,18 +267,18 @@ function filterBooks(query) {
 async function searchBooks() {
     const query = document.getElementById('searchInput').value.trim();
     if (!query) return;
-    
+
     const searchBtn = document.getElementById('searchBtn');
     searchBtn.textContent = 'Searching...';
     searchBtn.disabled = true;
-    
+
     try {
         const response = await fetch('/api/search-book', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ query })
         });
-        
+
         const data = await response.json();
         displaySearchResults(data.books);
     } catch (error) {
@@ -292,12 +292,12 @@ async function searchBooks() {
 
 function displaySearchResults(books) {
     const container = document.getElementById('searchResults');
-    
+
     if (!books || books.length === 0) {
         container.innerHTML = '<div class="empty-state"><p>No results found</p></div>';
         return;
     }
-    
+
     container.innerHTML = books.map(book => `
         <div class="search-result-card">
             <div class="book-header">
@@ -310,14 +310,14 @@ function displaySearchResults(books) {
                     <div class="book-author">by ${book.author}</div>
                 </div>
             </div>
-            
+
             <div class="book-meta">
                 ${book.price ? `<span class="price-tag">$${book.price.toFixed(2)}</span>` : ''}
                 ${book.rating ? `<span class="rating-tag">⭐ ${book.rating.toFixed(1)}</span>` : ''}
                 ${book.page_count ? `<span class="meta-item">${book.page_count} pages</span>` : ''}
                 ${book.category ? `<span class="meta-item">${book.category}</span>` : ''}
             </div>
-            
+
             <button class="btn btn-primary" style="margin-top: 15px; width: 100%;" onclick='addBook(${JSON.stringify(book)})'>
                 Add to Tracker
             </button>
@@ -332,7 +332,7 @@ async function addBook(bookData) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(bookData)
         });
-        
+
         if (response.ok) {
             alert('Book added successfully!');
             loadBooks();
@@ -351,18 +351,18 @@ async function viewBookDetails(bookId) {
     try {
         const response = await fetch(`/api/book/${bookId}`);
         const data = await response.json();
-        
+
         const book = data.book;
         const history = data.history;
-        
+
         const pricingResponse = await fetch(`/api/pricing-suggestion/${bookId}`);
         const pricingData = await pricingResponse.json();
-        
+
         const detailsHTML = `
             <h2>${book.title}</h2>
             <p><strong>Author:</strong> ${book.author}</p>
             ${book.description ? `<p>${book.description.substring(0, 300)}...</p>` : ''}
-            
+
             <div class="detail-section">
                 <h3>Current Information</h3>
                 <p><strong>Price:</strong> ${book.current_price ? `$${book.current_price.toFixed(2)}` : 'N/A'}</p>
@@ -372,7 +372,7 @@ async function viewBookDetails(bookId) {
                 <p><strong>Category:</strong> ${book.category || 'N/A'}</p>
                 <p><strong>Publisher:</strong> ${book.publisher || 'N/A'}</p>
             </div>
-            
+
             <div class="detail-section">
                 <h3>AI Pricing Suggestion</h3>
                 <div class="suggestion-box">
@@ -384,7 +384,7 @@ async function viewBookDetails(bookId) {
                     <p><strong>Analysis:</strong> ${pricingData.analysis.reasoning}</p>
                 </div>
             </div>
-            
+
             ${history.length > 0 ? `
                 <div class="detail-section">
                     <h3>Price & Rating History</h3>
@@ -393,7 +393,7 @@ async function viewBookDetails(bookId) {
                     </div>
                 </div>
             ` : ''}
-            
+
             <div class="detail-section">
                 <h3>Update Price/Rating</h3>
                 <div class="form-group">
@@ -407,10 +407,10 @@ async function viewBookDetails(bookId) {
                 <button class="btn btn-primary" onclick="updateBookPrice(${bookId})">Update</button>
             </div>
         `;
-        
+
         document.getElementById('bookDetails').innerHTML = detailsHTML;
         document.getElementById('bookModal').style.display = 'block';
-        
+
         if (history.length > 0) {
             setTimeout(() => renderHistoryChart(history), 100);
         }
@@ -423,15 +423,15 @@ async function viewBookDetails(bookId) {
 function renderHistoryChart(history) {
     const ctx = document.getElementById('historyChart');
     if (!ctx) return;
-    
+
     if (currentChart) {
         currentChart.destroy();
     }
-    
+
     const labels = history.map(h => new Date(h.snapshot_date).toLocaleDateString());
     const prices = history.map(h => h.price || 0);
     const ratings = history.map(h => (h.rating || 0) * 2);
-    
+
     currentChart = new Chart(ctx, {
         type: 'line',
         data: {
@@ -489,7 +489,7 @@ function renderHistoryChart(history) {
 async function updateBookPrice(bookId) {
     const newPrice = parseFloat(document.getElementById('newPrice').value);
     const newRating = parseFloat(document.getElementById('newRating').value);
-    
+
     try {
         const response = await fetch(`/api/update-price/${bookId}`, {
             method: 'POST',
@@ -499,7 +499,7 @@ async function updateBookPrice(bookId) {
                 rating: newRating 
             })
         });
-        
+
         if (response.ok) {
             alert('Price updated successfully!');
             document.getElementById('bookModal').style.display = 'none';
@@ -517,12 +517,12 @@ async function updateBookPrice(bookId) {
 
 async function deleteBook(bookId) {
     if (!confirm('Are you sure you want to delete this book?')) return;
-    
+
     try {
         const response = await fetch(`/api/book/${bookId}`, {
             method: 'DELETE'
         });
-        
+
         if (response.ok) {
             loadBooks();
             loadStats();
@@ -539,7 +539,7 @@ async function loadWatchlists() {
     try {
         const response = await fetch('/api/watchlists');
         const data = await response.json();
-        
+
         displayWatchlists(data.watchlists);
     } catch (error) {
         console.error('Error loading watchlists:', error);
@@ -548,7 +548,7 @@ async function loadWatchlists() {
 
 function displayWatchlists(watchlists) {
     const container = document.getElementById('watchlistsList');
-    
+
     if (watchlists.length === 0) {
         container.innerHTML = `
             <div class="empty-state">
@@ -558,7 +558,7 @@ function displayWatchlists(watchlists) {
         `;
         return;
     }
-    
+
     container.innerHTML = watchlists.map(watchlist => `
         <div class="watchlist-card" onclick="viewWatchlist(${watchlist.id})">
             <div class="watchlist-name">${watchlist.name}</div>
@@ -574,21 +574,21 @@ function initEventListeners() {
         btn.addEventListener('click', (e) => {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-            
+
             e.target.classList.add('active');
             document.getElementById(e.target.dataset.tab).classList.add('active');
         });
     });
-    
+
     // Search functionality
     document.getElementById('searchBtn')?.addEventListener('click', searchBooks);
     document.getElementById('searchInput')?.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') searchBooks();
     });
-    
+
     // Book filter
     document.getElementById('filterInput')?.addEventListener('input', filterBooks);
-    
+
     // Profit calculator
     document.getElementById('calculateBtn')?.addEventListener('click', calculateProfit);
     document.getElementById('formatSelect')?.addEventListener('change', (e) => {
@@ -596,7 +596,7 @@ function initEventListeners() {
         const ebookOptions = document.getElementById('ebookOptions');
         const paperbackOptions = document.getElementById('paperbackOptions');
         const hardcoverOptions = document.getElementById('hardcoverOptions');
-        
+
         if (format === 'ebook') {
             ebookOptions.style.display = 'block';
             if (paperbackOptions) paperbackOptions.style.display = 'none';
@@ -613,7 +613,7 @@ function initEventListeners() {
             document.getElementById('hardcoverCostInput').value = '5.50';
         }
     });
-    
+
     // Export
     document.getElementById('exportCSV')?.addEventListener('click', () => {
         window.location.href = '/api/export/csv';
@@ -621,35 +621,35 @@ function initEventListeners() {
     document.getElementById('exportPDF')?.addEventListener('click', () => {
         window.location.href = '/api/export/pdf';
     });
-    
+
     // Watchlist
     document.getElementById('createWatchlistBtn')?.addEventListener('click', () => {
         document.getElementById('createWatchlistModal').style.display = 'block';
     });
     document.getElementById('saveWatchlistBtn')?.addEventListener('click', createWatchlist);
-    
+
     // Notifications
     document.getElementById('notificationBtn')?.addEventListener('click', () => {
         const panel = document.getElementById('notificationPanel');
         panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
     });
-    
+
     // Dark mode
     document.getElementById('darkModeToggle')?.addEventListener('click', toggleDarkMode);
-    
+
     // Modal close buttons
     document.querySelectorAll('.modal .close').forEach(closeBtn => {
         closeBtn.addEventListener('click', (e) => {
             e.target.closest('.modal').style.display = 'none';
         });
     });
-    
+
     document.querySelectorAll('.notification-panel .close').forEach(closeBtn => {
         closeBtn.addEventListener('click', () => {
             document.getElementById('notificationPanel').style.display = 'none';
         });
     });
-    
+
     // Close modals on outside click
     window.addEventListener('click', (e) => {
         if (e.target.classList.contains('modal')) {
@@ -661,19 +661,19 @@ function initEventListeners() {
 async function createWatchlist() {
     const name = document.getElementById('watchlistName').value.trim();
     const description = document.getElementById('watchlistDescription').value.trim();
-    
+
     if (!name) {
         alert('Please enter a name');
         return;
     }
-    
+
     try {
         const response = await fetch('/api/watchlist', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name, description })
         });
-        
+
         if (response.ok) {
             document.getElementById('watchlistName').value = '';
             document.getElementById('watchlistDescription').value = '';
@@ -693,34 +693,35 @@ async function viewWatchlist(watchlistId) {
     try {
         const response = await fetch(`/api/watchlist/${watchlistId}/books`);
         const data = await response.json();
-        
-        alert(`Watchlist contains ${data.books.length} books. Full watchlist view coming soon!`);
+
+        showToast(`Watchlist contains ${data.books.length} books. Full view coming soon!`, 'info');
     } catch (error) {
         console.error('Error loading watchlist:', error);
+        showToast('Error loading watchlist', 'error');
     }
 }
 
 async function calculateProfit() {
     const format = document.getElementById('formatSelect').value;
     const price = parseFloat(document.getElementById('priceInput').value);
-    
+
     const requestData = { format, price };
-    
+
     if (format === 'ebook') {
         requestData.file_size = parseFloat(document.getElementById('fileSizeInput').value);
     } else {
         requestData.printing_cost = parseFloat(document.getElementById('printCostInput').value);
     }
-    
+
     try {
         const response = await fetch('/api/profit-calculator', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(requestData)
         });
-        
+
         const data = await response.json();
-        
+
         if (response.ok) {
             displayProfitResults(data);
         } else {
@@ -734,7 +735,7 @@ async function calculateProfit() {
 
 function displayProfitResults(data) {
     const container = document.getElementById('profitResults');
-    
+
     container.innerHTML = `
         <h3>Profit Calculation Results</h3>
         <div class="profit-item">
@@ -771,7 +772,7 @@ async function loadNotifications() {
     try {
         const response = await fetch('/api/notifications');
         const data = await response.json();
-        
+
         displayNotifications(data.notifications);
     } catch (error) {
         console.error('Error loading notifications:', error);
@@ -780,12 +781,12 @@ async function loadNotifications() {
 
 function displayNotifications(notifications) {
     const container = document.getElementById('notificationList');
-    
+
     if (notifications.length === 0) {
         container.innerHTML = '<div class="empty-state"><p>No notifications</p></div>';
         return;
     }
-    
+
     container.innerHTML = notifications.map(notif => `
         <div class="notification-item ${notif.is_read ? '' : 'unread'}" onclick="markNotificationRead(${notif.id})">
             <div class="notification-message">${notif.message}</div>
@@ -837,7 +838,7 @@ async function loadStats() {
     try {
         const response = await fetch('/api/stats');
         const data = await response.json();
-        
+
         document.getElementById('totalBooks').textContent = data.total_books;
         document.getElementById('avgPrice').textContent = `$${data.avg_price.toFixed(2)}`;
         document.getElementById('avgRating').textContent = data.avg_rating.toFixed(1);
@@ -851,9 +852,9 @@ async function loadBooks() {
     try {
         const response = await fetch('/api/books');
         const data = await response.json();
-        
+
         const booksList = document.getElementById('booksList');
-        
+
         if (data.books.length === 0) {
             booksList.innerHTML = `
                 <div class="empty-state">
@@ -863,7 +864,7 @@ async function loadBooks() {
             `;
             return;
         }
-        
+
         booksList.innerHTML = data.books.map(book => `
             <div class="book-card" onclick="viewBookDetails(${book.id})">
                 <div class="book-header">
@@ -891,29 +892,29 @@ async function loadBooks() {
 
 async function searchBooks() {
     const query = document.getElementById('searchInput').value.trim();
-    
+
     if (!query) {
         alert('Please enter a search term');
         return;
     }
-    
+
     const searchResults = document.getElementById('searchResults');
     searchResults.innerHTML = '<p>Searching...</p>';
-    
+
     try {
         const response = await fetch('/api/search-book', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ query })
         });
-        
+
         const data = await response.json();
-        
+
         if (data.books.length === 0) {
             searchResults.innerHTML = '<p>No books found</p>';
             return;
         }
-        
+
         searchResults.innerHTML = data.books.map(book => `
             <div class="book-card">
                 <div class="book-header">
@@ -941,7 +942,7 @@ async function searchBooks() {
 function filterBooks() {
     const filter = document.getElementById('filterInput').value.toLowerCase();
     const bookCards = document.querySelectorAll('#booksList .book-card');
-    
+
     bookCards.forEach(card => {
         const text = card.textContent.toLowerCase();
         card.style.display = text.includes(filter) ? 'block' : 'none';
@@ -951,9 +952,9 @@ function filterBooks() {
 async function calculateProfit() {
     const format = document.getElementById('formatSelect').value;
     const price = parseFloat(document.getElementById('priceInput').value);
-    
+
     const data = { price, format };
-    
+
     if (format === 'ebook') {
         data.file_size = parseFloat(document.getElementById('fileSizeInput').value);
     } else if (format === 'paperback') {
@@ -961,16 +962,16 @@ async function calculateProfit() {
     } else if (format === 'hardcover') {
         data.printing_cost = parseFloat(document.getElementById('hardcoverCostInput').value);
     }
-    
+
     try {
         const response = await fetch('/api/profit-calculator', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
         });
-        
+
         const result = await response.json();
-        
+
         if (response.ok) {
             const resultsDiv = document.getElementById('profitResults');
             resultsDiv.innerHTML = `
@@ -999,14 +1000,14 @@ async function loadWatchlists() {
     try {
         const response = await fetch('/api/watchlists');
         const data = await response.json();
-        
+
         const watchlistsList = document.getElementById('watchlistsList');
-        
+
         if (data.watchlists.length === 0) {
             watchlistsList.innerHTML = '<p>No watchlists yet. Create one to organize your books!</p>';
             return;
         }
-        
+
         watchlistsList.innerHTML = data.watchlists.map(wl => `
             <div class="book-card" onclick="viewWatchlist(${wl.id})">
                 <h3>${wl.name}</h3>
@@ -1023,14 +1024,14 @@ async function loadNotifications() {
     try {
         const response = await fetch('/api/notifications');
         const data = await response.json();
-        
+
         const notificationList = document.getElementById('notificationList');
-        
+
         if (data.notifications.length === 0) {
             notificationList.innerHTML = '<p>No notifications</p>';
             return;
         }
-        
+
         notificationList.innerHTML = data.notifications.map(notif => `
             <div class="notification-item ${notif.is_read ? 'read' : 'unread'}" onclick="markNotificationRead(${notif.id})">
                 <p><strong>${notif.title}</strong> - ${notif.author}</p>
@@ -1047,13 +1048,13 @@ async function viewBookDetails(bookId) {
     try {
         const response = await fetch(`/api/book/${bookId}`);
         const data = await response.json();
-        
+
         const book = data.book;
         const history = data.history;
-        
+
         const modal = document.getElementById('bookModal');
         const details = document.getElementById('bookDetails');
-        
+
         details.innerHTML = `
             <h2>${book.title}</h2>
             <p><strong>Author:</strong> ${book.author}</p>
@@ -1067,14 +1068,14 @@ async function viewBookDetails(bookId) {
             ${book.description ? `<p><strong>Description:</strong> ${book.description}</p>` : ''}
             ${history.length > 0 ? '<canvas id="priceChart"></canvas>' : ''}
         `;
-        
+
         modal.style.display = 'block';
-        
+
         if (history.length > 0) {
             setTimeout(() => {
                 const ctx = document.getElementById('priceChart').getContext('2d');
                 if (currentChart) currentChart.destroy();
-                
+
                 currentChart = new Chart(ctx, {
                     type: 'line',
                     data: {
@@ -1122,7 +1123,7 @@ async function getPricingSuggestion(bookId) {
     try {
         const response = await fetch(`/api/pricing-suggestion/${bookId}`);
         const data = await response.json();
-        
+
         alert(`Pricing Suggestion:\n\nSuggested Price: $${data.suggested_price}\nRange: $${data.min_price} - $${data.max_price}\n\n${data.analysis.reasoning}\nCompetitors: ${data.analysis.competitor_count}`);
     } catch (error) {
         console.error('Error getting pricing suggestion:', error);
@@ -1132,7 +1133,7 @@ async function getPricingSuggestion(bookId) {
 
 async function deleteBook(bookId) {
     if (!confirm('Are you sure you want to delete this book?')) return;
-    
+
     try {
         await fetch(`/api/book/${bookId}`, { method: 'DELETE' });
         loadBooks();
@@ -1147,7 +1148,7 @@ async function viewWatchlist(watchlistId) {
     try {
         const response = await fetch(`/api/watchlist/${watchlistId}/books`);
         const data = await response.json();
-        
+
         alert(`Watchlist contains ${data.books.length} books. Full watchlist view coming soon!`);
     } catch (error) {
         console.error('Error loading watchlist:', error);
