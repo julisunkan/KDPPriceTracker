@@ -6,15 +6,74 @@
 **KDP Books Price Tracker & Competitor Monitor** is a powerful Progressive Web App (PWA) designed for Kindle Direct Publishing authors, publishers, and self-publishing professionals. This comprehensive tool helps you stay competitive in the marketplace by tracking book prices, monitoring competitors, and providing AI-powered pricing insights.
 
 ### Key Features:
-- 📚 **Book Price Tracking**: Monitor KDP book prices in real-time using the Google Books API
-- 🤖 **AI Pricing Engine**: Get intelligent pricing suggestions based on competitor analysis and market trends
-- 💰 **KDP Royalty Calculator**: Calculate profits for both ebook (35%/70% tiers) and paperback formats
-- 📊 **Interactive Analytics**: Visualize price and rating trends with Chart.js
-- 📋 **Custom Watchlists**: Organize books by genre, author, or custom categories
-- 📥 **Export Tools**: Download your data as CSV or PDF reports
-- 🌙 **Dark Mode**: Toggle between light and dark themes
-- 📱 **Offline PWA**: Works offline with service worker caching
-- 🔔 **Smart Notifications**: Track price and rating changes automatically
+
+#### 📚 Book Management & Tracking
+- **Search Books**: Find books instantly using ISBN, title, or author via Google Books API
+- **Add to Tracker**: Save unlimited books to your personal tracking library
+- **Book Details**: View comprehensive information including title, author, publisher, page count, category, description, and thumbnail images
+- **Update Prices**: Manually update current prices and track changes over time
+- **Delete Books**: Remove books from your tracker when no longer needed
+
+#### 🤖 AI-Powered Pricing Intelligence
+- **Smart Price Suggestions**: Get AI-generated optimal price recommendations based on market analysis
+- **Competitor Analysis**: Automatically analyze competitor pricing in the same category
+- **Price Range Calculations**: See minimum, maximum, and average competitor prices
+- **Reasoning Engine**: Understand the logic behind each pricing suggestion
+- **Market Positioning**: Get insights on whether to price above, below, or at market average
+
+#### 💰 KDP Royalty Calculator
+- **Dual Format Support**: Calculate royalties for both ebook and paperback formats
+- **Ebook Tiers**: Support for both 35% and 70% royalty tiers
+- **Paperback Printing Costs**: Accurate calculations based on page count and printing costs
+- **Delivery Costs**: Automatic file size and delivery fee calculations for ebooks
+- **Profit Margins**: See exact profit per book sold at different price points
+- **Break-Even Analysis**: Understand minimum pricing requirements
+
+#### 📊 Advanced Analytics & Visualizations
+- **Price History Charts**: Interactive line charts showing price changes over time
+- **Rating Trends**: Track how ratings evolve with Chart.js visualizations
+- **Historical Data**: Complete price and rating history with timestamps
+- **Trend Analysis**: Identify patterns and optimal pricing windows
+- **Competitor Metrics**: Compare your pricing against market averages
+
+#### 📋 Watchlist Organization
+- **Custom Watchlists**: Create unlimited watchlists to organize your books
+- **Genre-Based Grouping**: Organize by fiction, non-fiction, romance, thriller, etc.
+- **Author Collections**: Track all books from specific authors
+- **Multi-Book Management**: Add/remove multiple books to watchlists
+- **Watchlist Analytics**: View aggregated stats for each watchlist
+
+#### 📥 Export & Reporting
+- **CSV Export**: Download complete book data in spreadsheet format
+- **PDF Reports**: Generate professional PDF reports with book details and analytics
+- **Customizable Exports**: Choose which data fields to include
+- **Batch Processing**: Export multiple books or entire watchlists at once
+
+#### 🌙 User Experience
+- **Dark Mode**: Eye-friendly dark theme with smooth toggle transitions
+- **Light Mode**: Clean, bright interface for daytime use
+- **Responsive Design**: Works perfectly on desktop, tablet, and mobile devices
+- **Fast Performance**: Optimized loading and smooth interactions
+- **Intuitive UI**: Easy-to-use interface with clear navigation
+
+#### 📱 Progressive Web App (PWA)
+- **Install to Device**: Add to home screen on mobile and desktop
+- **Offline Support**: Full functionality without internet connection
+- **Service Worker Caching**: Instant loading with cached assets
+- **Background Sync**: Automatic updates when connection is restored
+- **App-Like Experience**: Native app feel in the browser
+
+#### 🔔 Notifications & Alerts
+- **Price Change Alerts**: Get notified when tracked book prices change
+- **Rating Updates**: Track when ratings increase or decrease
+- **Toast Notifications**: Elegant in-app notifications for all actions
+- **Success/Error Feedback**: Clear visual feedback for user actions
+
+#### 🔒 Privacy & Security
+- **No Login Required**: Start tracking immediately without account creation
+- **Local Data Storage**: All data stored in SQLite database
+- **No Third-Party Tracking**: Privacy-focused design
+- **Secure API Calls**: Safe integration with Google Books API
 
 ## 🎯 Perfect For:
 - Self-published authors on KDP
