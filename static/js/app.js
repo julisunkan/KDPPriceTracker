@@ -241,8 +241,8 @@ function displayBooks(books) {
             </div>
 
             <div class="book-actions">
-                <button class="action-btn btn-primary" onclick="viewBookDetails(${book.id})">View Details</button>
-                <button class="action-btn btn-danger" onclick="deleteBook(${book.id})">Delete</button>
+                <button class="action-btn btn-primary" onclick="event.stopPropagation(); viewBookDetails(${book.id})">View Details</button>
+                <button class="action-btn btn-danger" onclick="event.stopPropagation(); deleteBook(${book.id})">Delete</button>
             </div>
         </div>
     `).join('');
@@ -958,7 +958,7 @@ async function loadBooks() {
         }
 
         booksList.innerHTML = data.books.map(book => `
-            <div class="book-card" onclick="viewBookDetails(${book.id})">
+            <div class="book-card" data-book-id="${book.id}">
                 <div class="book-header">
                     ${book.thumbnail_url ? `<img src="${book.thumbnail_url}" alt="${book.title}" class="book-thumbnail">` : '<div class="book-thumbnail"></div>'}
                     <div class="book-info">
