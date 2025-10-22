@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="KDP Books Price Tracker & Competitor Monitor">
+    <meta name="theme-color" content="#1e40af">
+    <title>KDP Books Price Tracker</title>
+    
+    <link rel="manifest" href="/static/manifest.json">
+    <link rel="icon" type="image/png" href="/static/icons/icon-192x192.png">
+    <link rel="apple-touch-icon" href="/static/icons/icon-192x192.png">
+    <link rel="stylesheet" href="/static/css/style.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <h1>📚 KDP Books Price Tracker</h1>
+                <div class="header-actions">
+                    <button id="notificationBtn" class="icon-btn">
+                        🔔
+                        <span id="notificationBadge" class="badge">0</span>
+                    </button>
+                    <button id="darkModeToggle" class="icon-btn">🌙</button>
+                </div>
+            </div>
+            
+            <div class="stats-bar">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalBooks">0</div>
+                    <div class="stat-label">Total Books</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="avgPrice">$0.00</div>
+                    <div class="stat-label">Avg Price</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="avgRating">0.0</div>
+                    <div class="stat-label">Avg Rating</div>
+                </div>
+            </div>
+        </header>
+
+        <nav class="tabs">
+            <button class="tab-btn active" data-tab="dashboard">Dashboard</button>
+            <button class="tab-btn" data-tab="search">Add Book</button>
+            <button class="tab-btn" data-tab="watchlists">Watchlists</button>
+            <button class="tab-btn" data-tab="calculator">Profit Calculator</button>
+            <button class="tab-btn" data-tab="export">Export Data</button>
+        </nav>
+
+        <main>
+            <div id="dashboard" class="tab-content active">
+                <div class="section-header">
+                    <h2>Your Tracked Books</h2>
+                    <input type="text" id="filterInput" placeholder="Filter books..." class="search-input">
+                </div>
+                
+                <div id="booksList" class="books-grid">
+                    <div class="empty-state">
+                        <p>📖 No books tracked yet</p>
+                        <p>Start by adding books from the "Add Book" tab</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="search" class="tab-content">
+                <div class="search-section">
+                    <h2>Search & Add Books</h2>
+                    <div class="search-bar">
+                        <input type="text" id="searchInput" placeholder="Search by title, author, or ISBN..." class="search-input">
+                        <button id="searchBtn" class="btn btn-primary">Search</button>
+                    </div>
+                    
+                    <div id="searchResults" class="search-results"></div>
+                </div>
+            </div>
+
+            <div id="watchlists" class="tab-content">
+                <div class="section-header">
+                    <h2>Watchlists</h2>
+                    <button id="createWatchlistBtn" class="btn btn-primary">+ Create Watchlist</button>
+                </div>
+                
+                <div id="watchlistsList" class="watchlists-grid"></div>
+            </div>
+
+            <div id="calculator" class="tab-content">
+                <div class="calculator-section">
+                    <h2>KDP Profit Calculator</h2>
+                    
+                    <div class="form-group">
+                        <label>Book Format</label>
+                        <select id="formatSelect" class="form-control">
+                            <option value="ebook">Kindle eBook</option>
+                            <option value="paperback">Paperback</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>List Price ($)</label>
+                        <input type="number" id="priceInput" class="form-control" min="0.99" step="0.01" value="2.99">
+                    </div>
+                    
+                    <div id="ebookOptions" class="form-group">
+                        <label>File Size (MB)</label>
+                        <input type="number" id="fileSizeInput" class="form-control" min="0" step="0.1" value="2">
+                    </div>
+                    
+                    <div id="paperbackOptions" class="form-group" style="display: none;">
+                        <label>Printing Cost ($)</label>
+                        <input type="number" id="printCostInput" class="form-control" min="0" step="0.01" value="3.00">
+                    </div>
+                    
+                    <button id="calculateBtn" class="btn btn-primary">Calculate Profit</button>
+                    
+                    <div id="profitResults" class="profit-results"></div>
+                </div>
+            </div>
+
+            <div id="export" class="tab-content">
+                <div class="export-section">
+                    <h2>Export Your Data</h2>
+                    <p>Download your tracked books data in CSV or PDF format</p>
+                    
+                    <div class="export-buttons">
+                        <button id="exportCSV" class="btn btn-success">📊 Export as CSV</button>
+                        <button id="exportPDF" class="btn btn-danger">📄 Export as PDF</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="bookModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div id="bookDetails"></div>
+        </div>
+    </div>
+
+    <div id="notificationPanel" class="notification-panel">
+        <div class="notification-header">
+            <h3>Notifications</h3>
+            <span class="close">&times;</span>
+        </div>
+        <div id="notificationList" class="notification-list"></div>
+    </div>
+
+    <div id="createWatchlistModal" class="modal">
+        <div class="modal-content modal-small">
+            <span class="close">&times;</span>
+            <h2>Create Watchlist</h2>
+            <div class="form-group">
+                <label>Name</label>
+                <input type="text" id="watchlistName" class="form-control" placeholder="e.g., Mystery Novels">
+            </div>
+            <div class="form-group">
+                <label>Description</label>
+                <textarea id="watchlistDescription" class="form-control" placeholder="Optional description"></textarea>
+            </div>
+            <button id="saveWatchlistBtn" class="btn btn-primary">Create</button>
+        </div>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/static/service-worker.js')
+                .then(reg => console.log('Service Worker registered'))
+                .catch(err => console.log('Service Worker registration failed'));
+        }
+    </script>
+</body>
+</html>
