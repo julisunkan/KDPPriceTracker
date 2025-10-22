@@ -1111,6 +1111,8 @@ async function calculateProfit() {
         data.printing_cost = parseFloat(document.getElementById('hardcoverCostInput').value);
     }
 
+    const resultsDiv = document.getElementById('profitResults');
+
     try {
         const response = await fetch('/api/profit-calculator', {
             method: 'POST',
@@ -1121,7 +1123,6 @@ async function calculateProfit() {
         const result = await response.json();
 
         if (response.ok) {
-            const resultsDiv = document.getElementById('profitResults');
             resultsDiv.innerHTML = `
                 <h3>Profit Analysis</h3>
                 <div class="profit-card">
@@ -1136,11 +1137,20 @@ async function calculateProfit() {
                 </div>
             `;
         } else {
-            alert(result.error);
+            resultsDiv.innerHTML = `
+                <div class="inline-message inline-message-warning show">
+                    <span><strong>⚠️ ${result.error}</strong></span>
+                    ${result.min_price ? `<p style="margin-top: 10px;">Minimum price required: <strong>$${result.min_price}</strong></p>` : ''}
+                </div>
+            `;
         }
     } catch (error) {
         console.error('Error calculating profit:', error);
-        alert('Error calculating profit');
+        resultsDiv.innerHTML = `
+            <div class="inline-message inline-message-error show">
+                <span>Error calculating profit. Please try again.</span>
+            </div>
+        `;
     }
 }
 
