@@ -1,12 +1,14 @@
+
 {
-  "name": "KDP Books Price Tracker",
+  "name": "KDP Books Price Tracker & Competitor Monitor",
   "short_name": "KDP Tracker",
-  "description": "Track KDP book prices, monitor competitors, and get AI-powered pricing insights",
+  "description": "Track Kindle Direct Publishing book prices, monitor competitors, get AI-powered pricing insights, calculate KDP royalties, and analyze market trends with interactive charts. Perfect for authors, publishers, and self-publishing professionals.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#1e40af",
   "orientation": "portrait-primary",
+  "categories": ["books", "productivity", "business", "education", "finance"],
   "icons": [
     {
       "src": "/static/icons/icon-72x72.png",
@@ -105,7 +107,6 @@
       "purpose": "maskable"
     }
   ],
-  "categories": ["books", "productivity", "business"],
   "screenshots": [],
   "shortcuts": [
     {
@@ -120,5 +121,32 @@
         }
       ]
     }
+  ],
+  "keywords": [
+    "KDP",
+    "Kindle Direct Publishing",
+    "book price tracker",
+    "competitor analysis",
+    "pricing strategy",
+    "royalty calculator",
+    "self-publishing",
+    "book marketing",
+    "author tools",
+    "publishing analytics",
+    "price monitoring",
+    "ebook pricing",
+    "paperback pricing",
+    "Amazon KDP",
+    "book trends",
+    "pricing insights",
+    "market research",
+    "competitive analysis",
+    "publishing profit",
+    "author revenue",
+    "book watchlist",
+    "price alerts",
+    "rating tracker",
+    "genre analysis",
+    "publishing business"
   ]
 }
