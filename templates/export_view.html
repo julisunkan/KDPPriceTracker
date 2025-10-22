@@ -7,87 +7,306 @@
     <title>{{ export_type }} Export - KDP Books Price Tracker</title>
     <link rel="stylesheet" href="/static/css/style.css">
     <style>
+        body {
+            background: var(--bg-secondary);
+        }
+        
         .export-view-container {
-            max-width: 1400px;
+            max-width: 1600px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 30px 20px;
         }
+        
         .export-view-header {
-            background: var(--bg-primary);
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: var(--shadow);
-            margin-bottom: 20px;
+            background: linear-gradient(135deg, var(--accent-color), #3b82f6);
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: var(--shadow-lg);
+            margin-bottom: 30px;
+            color: white;
         }
+        
         .export-title-section {
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 20px;
+            gap: 25px;
         }
+        
+        .export-title-content {
+            flex: 1;
+            min-width: 280px;
+        }
+        
         .export-title-section h1 {
-            font-size: 2rem;
-            color: var(--accent-color);
-            margin: 0;
+            font-size: 2.5rem;
+            color: white;
+            margin: 0 0 15px 0;
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
+        
         .export-filename {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            margin-top: 10px;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 1rem;
+            margin: 0;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            display: inline-block;
+            backdrop-filter: blur(10px);
         }
+        
+        .export-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .meta-badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 12px 20px;
+            border-radius: 10px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .meta-badge-label {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .meta-badge-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
         .export-actions {
             display: flex;
-            gap: 10px;
+            gap: 12px;
             flex-wrap: wrap;
         }
+        
+        .export-actions .btn {
+            padding: 14px 28px;
+            font-size: 1rem;
+            font-weight: 600;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .export-actions .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        
         .export-content {
             background: var(--bg-primary);
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: var(--shadow);
-        }
-        .csv-table {
-            width: 100%;
-            border-collapse: collapse;
-            background: var(--bg-secondary);
-            border-radius: 8px;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: var(--shadow-lg);
             overflow: hidden;
         }
-        .csv-table thead {
-            background: var(--accent-color);
-            color: white;
+        
+        .csv-container {
+            overflow-x: auto;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
         }
-        .csv-table th,
+        
+        .csv-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: var(--bg-primary);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .csv-table thead {
+            background: linear-gradient(135deg, var(--accent-color), #2563eb);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .csv-table th {
+            padding: 18px 20px;
+            text-align: left;
+            color: white;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 3px solid rgba(255, 255, 255, 0.2);
+            white-space: nowrap;
+        }
+        
         .csv-table td {
-            padding: 12px 15px;
+            padding: 16px 20px;
             text-align: left;
             border-bottom: 1px solid var(--border-color);
             color: var(--text-primary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            vertical-align: middle;
         }
+        
+        .csv-table tbody tr {
+            transition: all 0.2s ease;
+            background: var(--bg-primary);
+        }
+        
+        .csv-table tbody tr:nth-child(even) {
+            background: var(--bg-secondary);
+        }
+        
         .csv-table tbody tr:hover {
             background: var(--bg-tertiary);
+            transform: scale(1.01);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
         }
+        
         .csv-table tbody tr:last-child td {
             border-bottom: none;
         }
+        
         .pdf-viewer {
             width: 100%;
-            height: 800px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
+            height: 900px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
             background: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
         }
-        @media (max-width: 768px) {
+        
+        .content-header {
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--border-color);
+        }
+        
+        .content-header h2 {
+            font-size: 1.8rem;
+            color: var(--accent-color);
+            margin: 0;
+            font-weight: 600;
+        }
+        
+        .content-subtitle {
+            color: var(--text-secondary);
+            margin-top: 8px;
+            font-size: 1rem;
+        }
+        
+        .export-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            background: var(--success-color);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-left: 12px;
+        }
+        
+        .loading-placeholder {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+        
+        .loading-placeholder .spinner {
+            border: 4px solid var(--bg-tertiary);
+            border-top: 4px solid var(--accent-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 1024px) {
             .export-title-section {
                 flex-direction: column;
                 align-items: flex-start;
             }
-            .export-view-header h1 {
-                font-size: 1.5rem;
+            
+            .export-actions {
+                width: 100%;
             }
+            
+            .export-actions .btn {
+                flex: 1;
+                min-width: 140px;
+            }
+            
+            .export-meta {
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .export-view-container {
+                padding: 20px 15px;
+            }
+            
+            .export-view-header {
+                padding: 30px 25px;
+            }
+            
+            .export-title-section h1 {
+                font-size: 2rem;
+            }
+            
+            .export-content {
+                padding: 25px 20px;
+            }
+            
+            .pdf-viewer {
+                height: 600px;
+            }
+            
+            .csv-table th,
+            .csv-table td {
+                padding: 12px 15px;
+                font-size: 0.9rem;
+            }
+            
+            .meta-badge-value {
+                font-size: 1.3rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .export-title-section h1 {
+                font-size: 1.6rem;
+            }
+            
+            .export-filename {
+                font-size: 0.9rem;
+                padding: 8px 15px;
+            }
+            
             .pdf-viewer {
                 height: 500px;
+            }
+            
+            .csv-table {
+                font-size: 0.85rem;
+            }
+            
+            .export-meta {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -96,9 +315,20 @@
     <div class="export-view-container">
         <div class="export-view-header">
             <div class="export-title-section">
-                <div>
+                <div class="export-title-content">
                     <h1>📊 {{ export_type }} Export</h1>
-                    <p class="export-filename">Filename: {{ filename }}</p>
+                    <p class="export-filename">📁 {{ filename }}</p>
+                    
+                    <div class="export-meta">
+                        <div class="meta-badge">
+                            <div class="meta-badge-label">Format</div>
+                            <div class="meta-badge-value">{{ export_type }}</div>
+                        </div>
+                        <div class="meta-badge">
+                            <div class="meta-badge-label">Status</div>
+                            <div class="meta-badge-value">✓ Ready</div>
+                        </div>
+                    </div>
                 </div>
                 <div class="export-actions">
                     <a href="/" class="btn btn-secondary">← Back to Dashboard</a>
@@ -107,8 +337,28 @@
         </div>
         
         <div class="export-content">
+            <div class="content-header">
+                <h2>
+                    {% if export_type == 'CSV' %}
+                    Data Table View
+                    {% else %}
+                    Document Preview
+                    {% endif %}
+                    <span class="export-badge">{{ export_type }}</span>
+                </h2>
+                <p class="content-subtitle">
+                    {% if export_type == 'CSV' %}
+                    All your tracked books displayed in a structured table format
+                    {% else %}
+                    Professional PDF report of your tracked books
+                    {% endif %}
+                </p>
+            </div>
+            
             {% if export_type == 'CSV' %}
-                {{ content | safe }}
+                <div class="csv-container">
+                    {{ content | safe }}
+                </div>
             {% else %}
                 <embed class="pdf-viewer" src="data:application/pdf;base64,{{ content }}" type="application/pdf">
             {% endif %}
@@ -120,6 +370,9 @@
         if (localStorage.getItem('darkMode') === 'enabled') {
             document.body.classList.add('dark-mode');
         }
+        
+        // Add smooth scroll behavior
+        document.querySelector('html').style.scrollBehavior = 'smooth';
     </script>
 </body>
 </html>
