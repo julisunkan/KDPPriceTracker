@@ -694,10 +694,102 @@ async function viewWatchlist(watchlistId) {
         const response = await fetch(`/api/watchlist/${watchlistId}/books`);
         const data = await response.json();
 
-        showToast(`Watchlist contains ${data.books.length} books. Full view coming soon!`, 'info');
+        // Get watchlist info
+        const watchlistsResponse = await fetch('/api/watchlists');
+        const watchlistsData = await watchlistsResponse.json();
+        const watchlist = watchlistsData.watchlists.find(w => w.id === watchlistId);
+
+        const watchlistHTML = `
+            <h2>${watchlist.name}</h2>
+            ${watchlist.description ? `<p class="watchlist-description">${watchlist.description}</p>` : ''}
+            <p class="watchlist-book-count">${data.books.length} books in this watchlist</p>
+            
+            ${data.books.length === 0 ? `
+                <div class="empty-state" style="margin-top: 30px;">
+                    <p>📚 No books in this watchlist yet</p>
+                    <p>Add books from your tracked books to organize them here</p>
+                </div>
+            ` : `
+                <div class="watchlist-books-grid">
+                    ${data.books.map(book => `
+                        <div class="book-card" data-book-id="${book.id}">
+                            <div class="book-header">
+                                ${book.thumbnail_url ? 
+                                    `<img src="${book.thumbnail_url}" alt="${book.title}" class="book-thumbnail">` :
+                                    `<div class="book-thumbnail">📚</div>`
+                                }
+                                <div class="book-info">
+                                    <div class="book-title">${book.title}</div>
+                                    <div class="book-author">by ${book.author}</div>
+                                </div>
+                            </div>
+
+                            <div class="book-meta">
+                                ${book.current_price ? `<span class="price-tag">$${book.current_price.toFixed(2)}</span>` : ''}
+                                ${book.rating ? `<span class="rating-tag">⭐ ${book.rating.toFixed(1)}</span>` : ''}
+                                ${book.page_count ? `<span class="meta-item">${book.page_count} pages</span>` : ''}
+                            </div>
+
+                            <div class="book-actions">
+                                <button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); viewBookDetails(${book.id})">View Details</button>
+                                <button class="btn btn-danger btn-sm" onclick="event.stopPropagation(); removeFromWatchlist(${watchlistId}, ${book.id})">Remove</button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `}
+        `;
+
+        document.getElementById('bookDetails').innerHTML = watchlistHTML;
+        document.getElementById('bookModal').style.display = 'block';
     } catch (error) {
         console.error('Error loading watchlist:', error);
         showToast('Error loading watchlist', 'error');
+    }
+}
+
+async function removeFromWatchlist(watchlistId, bookId) {
+    const bookCard = document.querySelector(`[data-book-id="${bookId}"]`);
+    if (!bookCard) return;
+
+    // Check if confirmation already exists
+    if (bookCard.querySelector('.delete-confirmation')) return;
+
+    // Create inline confirmation
+    const confirmationDiv = document.createElement('div');
+    confirmationDiv.className = 'inline-message inline-message-warning show delete-confirmation';
+    confirmationDiv.innerHTML = `
+        <span>Remove this book from watchlist?</span>
+        <div style="display: flex; gap: 10px; margin-left: auto;">
+            <button class="btn btn-danger btn-sm" onclick="confirmRemoveFromWatchlist(${watchlistId}, ${bookId})">Remove</button>
+            <button class="btn btn-secondary btn-sm" onclick="cancelRemoveFromWatchlist(${bookId})">Cancel</button>
+        </div>
+    `;
+
+    // Insert before book actions
+    const bookActions = bookCard.querySelector('.book-actions');
+    bookCard.insertBefore(confirmationDiv, bookActions);
+}
+
+async function confirmRemoveFromWatchlist(watchlistId, bookId) {
+    try {
+        await fetch(`/api/watchlist/${watchlistId}/remove-book/${bookId}`, { method: 'DELETE' });
+        showToast('Book removed from watchlist', 'success');
+        // Reload the watchlist view
+        viewWatchlist(watchlistId);
+    } catch (error) {
+        console.error('Error removing book from watchlist:', error);
+        showToast('Error removing book from watchlist', 'error');
+    }
+}
+
+function cancelRemoveFromWatchlist(bookId) {
+    const bookCard = document.querySelector(`[data-book-id="${bookId}"]`);
+    if (!bookCard) return;
+
+    const confirmation = bookCard.querySelector('.delete-confirmation');
+    if (confirmation) {
+        confirmation.remove();
     }
 }
 

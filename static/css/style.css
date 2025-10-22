@@ -508,6 +508,25 @@ header {
     color: var(--text-secondary);
 }
 
+.watchlist-description {
+    color: var(--text-secondary);
+    margin: 10px 0;
+    font-style: italic;
+}
+
+.watchlist-book-count {
+    color: var(--text-secondary);
+    margin: 15px 0;
+    font-weight: 500;
+}
+
+.watchlist-books-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
 .notification-panel {
     position: fixed;
     right: -400px;
