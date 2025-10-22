@@ -1357,10 +1357,27 @@ async function getPricingSuggestion(bookId) {
     }
 }
 
-async function applyPriceSuggestion(bookId, suggestedPrice) {
-    const confirmed = confirm(`Apply suggested price of $${suggestedPrice}?`);
-    if (!confirmed) return;
+function applyPriceSuggestion(bookId, suggestedPrice) {
+    const actionSection = document.querySelector('.action-section');
+    if (!actionSection) return;
 
+    if (actionSection.querySelector('.apply-confirmation')) return;
+
+    const confirmationDiv = document.createElement('div');
+    confirmationDiv.className = 'inline-message inline-message-info show apply-confirmation';
+    confirmationDiv.innerHTML = `
+        <span>Apply suggested price of $${suggestedPrice}?</span>
+        <div style="display: flex; gap: 10px; margin-left: auto;">
+            <button class="btn btn-primary btn-sm" onclick="confirmApplyPriceSuggestion(${bookId}, ${suggestedPrice})">Apply</button>
+            <button class="btn btn-secondary btn-sm" onclick="cancelApplyPriceSuggestion()">Cancel</button>
+        </div>
+    `;
+
+    actionSection.querySelector('button').style.display = 'none';
+    actionSection.appendChild(confirmationDiv);
+}
+
+async function confirmApplyPriceSuggestion(bookId, suggestedPrice) {
     try {
         const bookResponse = await fetch(`/api/book/${bookId}`);
         const bookData = await bookResponse.json();
@@ -1387,6 +1404,21 @@ async function applyPriceSuggestion(bookId, suggestedPrice) {
     } catch (error) {
         console.error('Error applying price suggestion:', error);
         showToast('Error applying price suggestion', 'error');
+    }
+}
+
+function cancelApplyPriceSuggestion() {
+    const actionSection = document.querySelector('.action-section');
+    if (!actionSection) return;
+
+    const confirmation = actionSection.querySelector('.apply-confirmation');
+    if (confirmation) {
+        confirmation.remove();
+    }
+
+    const button = actionSection.querySelector('button');
+    if (button) {
+        button.style.display = 'block';
     }
 }
 
