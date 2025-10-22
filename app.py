@@ -337,7 +337,7 @@ def calculate_profit():
             }
         })
     
-    else:
+    elif format_type == 'paperback':
         printing_cost = data.get('printing_cost', 3.00)
         royalty_rate = 0.60
         
@@ -357,6 +357,29 @@ def calculate_profit():
                 'min': round(printing_cost * 1.5, 2),
                 'max': round(printing_cost * 3, 2),
                 'reason': 'Competitive pricing for paperback'
+            }
+        })
+    
+    else:  # hardcover
+        printing_cost = data.get('printing_cost', 5.50)
+        royalty_rate = 0.60
+        
+        if price < printing_cost * 1.2:
+            return jsonify({
+                'error': 'Price too low',
+                'min_price': round(printing_cost * 1.2, 2)
+            }), 400
+        
+        profit = (price - printing_cost) * royalty_rate
+        
+        return jsonify({
+            'profit_per_sale': round(profit, 2),
+            'royalty_rate': int(royalty_rate * 100),
+            'printing_cost': printing_cost,
+            'recommended_range': {
+                'min': round(printing_cost * 2, 2),
+                'max': round(printing_cost * 4, 2),
+                'reason': 'Premium pricing for hardcover'
             }
         })
 

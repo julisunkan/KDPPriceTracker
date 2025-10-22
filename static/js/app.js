@@ -11,6 +11,104 @@ function initApp() {
     loadNotifications();
     initEventListeners();
     initDarkMode();
+    loadSampleBooks();
+}
+
+async function loadSampleBooks() {
+    const sampleBooks = [
+        {
+            isbn: '9780544003415',
+            title: 'The Lord of the Rings',
+            author: 'J.R.R. Tolkien',
+            price: 14.99,
+            rating: 4.8,
+            reviews_count: 25000,
+            page_count: 1178,
+            category: 'Fantasy, Fiction',
+            publisher: 'Mariner Books',
+            published_date: '2012-09-18',
+            description: 'One Ring to rule them all... The dark, fearsome Ringwraiths are searching for a Hobbit. Frodo Baggins knows they are seeking him and the Ring he bears—the Ring of Power that would enable Sauron to destroy all that is good in Middle-earth.',
+            thumbnail_url: 'https://books.google.com/books/content?id=aWZzLPhY4o0C&printsec=frontcover&img=1&zoom=1'
+        },
+        {
+            isbn: '9780062024039',
+            title: 'Unbroken',
+            author: 'Laura Hillenbrand',
+            price: 9.99,
+            rating: 4.7,
+            reviews_count: 18500,
+            page_count: 473,
+            category: 'Biography, History',
+            publisher: 'Random House',
+            published_date: '2010-11-16',
+            description: 'In boyhood, Louis Zamperini was an incorrigible delinquent. As a teenager, he channeled his defiance into running, discovering a prodigious talent that had carried him to the Berlin Olympics. But when World War II began, the athlete became an airman.',
+            thumbnail_url: 'https://books.google.com/books/content?id=2bJkBAAAQBAJ&printsec=frontcover&img=1&zoom=1'
+        },
+        {
+            isbn: '9780316769174',
+            title: 'The Catcher in the Rye',
+            author: 'J.D. Salinger',
+            price: 7.99,
+            rating: 3.8,
+            reviews_count: 12000,
+            page_count: 234,
+            category: 'Fiction, Classic',
+            publisher: 'Little, Brown and Company',
+            published_date: '1991-05-01',
+            description: 'The hero-narrator of The Catcher in the Rye is an ancient child of sixteen, a native New Yorker named Holden Caulfield. Through circumstances that tend to preclude adult, secondhand description, he leaves his prep school in Pennsylvania and goes underground in New York City for three days.',
+            thumbnail_url: 'https://books.google.com/books/content?id=PCDengEACAAJ&printsec=frontcover&img=1&zoom=1'
+        },
+        {
+            isbn: '9780061120084',
+            title: 'To Kill a Mockingbird',
+            author: 'Harper Lee',
+            price: 8.99,
+            rating: 4.8,
+            reviews_count: 32000,
+            page_count: 324,
+            category: 'Fiction, Classic',
+            publisher: 'Harper Perennial Modern Classics',
+            published_date: '2006-05-23',
+            description: 'The unforgettable novel of a childhood in a sleepy Southern town and the crisis of conscience that rocked it. "To Kill A Mockingbird" became both an instant bestseller and a critical success when it was first published in 1960.',
+            thumbnail_url: 'https://books.google.com/books/content?id=PGR2AwAAQBAJ&printsec=frontcover&img=1&zoom=1'
+        },
+        {
+            isbn: '9780547928227',
+            title: '1984',
+            author: 'George Orwell',
+            price: 12.99,
+            rating: 4.6,
+            reviews_count: 28000,
+            page_count: 328,
+            category: 'Fiction, Science Fiction, Dystopian',
+            publisher: 'Mariner Books',
+            published_date: '2013-01-01',
+            description: 'Written in 1948, 1984 was George Orwell\'s chilling prophecy about the future. And while 1984 has come and gone, his dystopian vision of a government that will do anything to control the narrative is timelier than ever.',
+            thumbnail_url: 'https://books.google.com/books/content?id=kotPYEqx7kMC&printsec=frontcover&img=1&zoom=1'
+        }
+    ];
+    
+    // Check if books already exist
+    try {
+        const response = await fetch('/api/books');
+        const data = await response.json();
+        
+        if (data.books.length === 0) {
+            // Add sample books
+            for (const book of sampleBooks) {
+                await fetch('/api/add-book', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(book)
+                });
+            }
+            console.log('Sample books added successfully');
+            loadBooks();
+            loadStats();
+        }
+    } catch (error) {
+        console.error('Error loading sample books:', error);
+    }
 }
 
 function initEventListeners() {
@@ -470,6 +568,96 @@ function displayWatchlists(watchlists) {
     `).join('');
 }
 
+function initEventListeners() {
+    // Tab navigation
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            e.target.classList.add('active');
+            document.getElementById(e.target.dataset.tab).classList.add('active');
+        });
+    });
+    
+    // Search functionality
+    document.getElementById('searchBtn')?.addEventListener('click', searchBooks);
+    document.getElementById('searchInput')?.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') searchBooks();
+    });
+    
+    // Book filter
+    document.getElementById('filterInput')?.addEventListener('input', filterBooks);
+    
+    // Profit calculator
+    document.getElementById('calculateBtn')?.addEventListener('click', calculateProfit);
+    document.getElementById('formatSelect')?.addEventListener('change', (e) => {
+        const format = e.target.value;
+        const ebookOptions = document.getElementById('ebookOptions');
+        const paperbackOptions = document.getElementById('paperbackOptions');
+        const hardcoverOptions = document.getElementById('hardcoverOptions');
+        
+        if (format === 'ebook') {
+            ebookOptions.style.display = 'block';
+            if (paperbackOptions) paperbackOptions.style.display = 'none';
+            if (hardcoverOptions) hardcoverOptions.style.display = 'none';
+        } else if (format === 'paperback') {
+            ebookOptions.style.display = 'none';
+            if (paperbackOptions) paperbackOptions.style.display = 'block';
+            if (hardcoverOptions) hardcoverOptions.style.display = 'none';
+            document.getElementById('printCostInput').value = '3.00';
+        } else if (format === 'hardcover') {
+            ebookOptions.style.display = 'none';
+            if (paperbackOptions) paperbackOptions.style.display = 'none';
+            if (hardcoverOptions) hardcoverOptions.style.display = 'block';
+            document.getElementById('hardcoverCostInput').value = '5.50';
+        }
+    });
+    
+    // Export
+    document.getElementById('exportCSV')?.addEventListener('click', () => {
+        window.location.href = '/api/export/csv';
+    });
+    document.getElementById('exportPDF')?.addEventListener('click', () => {
+        window.location.href = '/api/export/pdf';
+    });
+    
+    // Watchlist
+    document.getElementById('createWatchlistBtn')?.addEventListener('click', () => {
+        document.getElementById('createWatchlistModal').style.display = 'block';
+    });
+    document.getElementById('saveWatchlistBtn')?.addEventListener('click', createWatchlist);
+    
+    // Notifications
+    document.getElementById('notificationBtn')?.addEventListener('click', () => {
+        const panel = document.getElementById('notificationPanel');
+        panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+    });
+    
+    // Dark mode
+    document.getElementById('darkModeToggle')?.addEventListener('click', toggleDarkMode);
+    
+    // Modal close buttons
+    document.querySelectorAll('.modal .close').forEach(closeBtn => {
+        closeBtn.addEventListener('click', (e) => {
+            e.target.closest('.modal').style.display = 'none';
+        });
+    });
+    
+    document.querySelectorAll('.notification-panel .close').forEach(closeBtn => {
+        closeBtn.addEventListener('click', () => {
+            document.getElementById('notificationPanel').style.display = 'none';
+        });
+    });
+    
+    // Close modals on outside click
+    window.addEventListener('click', (e) => {
+        if (e.target.classList.contains('modal')) {
+            e.target.style.display = 'none';
+        }
+    });
+}
+
 async function createWatchlist() {
     const name = document.getElementById('watchlistName').value.trim();
     const description = document.getElementById('watchlistDescription').value.trim();
@@ -641,4 +829,349 @@ function initDarkMode() {
 
 function openModal(modalId) {
     document.getElementById(modalId).style.display = 'block';
+}
+
+
+
+async function loadStats() {
+    try {
+        const response = await fetch('/api/stats');
+        const data = await response.json();
+        
+        document.getElementById('totalBooks').textContent = data.total_books;
+        document.getElementById('avgPrice').textContent = `$${data.avg_price.toFixed(2)}`;
+        document.getElementById('avgRating').textContent = data.avg_rating.toFixed(1);
+        document.getElementById('notificationBadge').textContent = data.unread_notifications;
+    } catch (error) {
+        console.error('Error loading stats:', error);
+    }
+}
+
+async function loadBooks() {
+    try {
+        const response = await fetch('/api/books');
+        const data = await response.json();
+        
+        const booksList = document.getElementById('booksList');
+        
+        if (data.books.length === 0) {
+            booksList.innerHTML = `
+                <div class="empty-state">
+                    <p>📖 No books tracked yet</p>
+                    <p>Start by adding books from the "Add Book" tab</p>
+                </div>
+            `;
+            return;
+        }
+        
+        booksList.innerHTML = data.books.map(book => `
+            <div class="book-card" onclick="viewBookDetails(${book.id})">
+                <div class="book-header">
+                    ${book.thumbnail_url ? `<img src="${book.thumbnail_url}" alt="${book.title}" class="book-thumbnail">` : '<div class="book-thumbnail"></div>'}
+                    <div class="book-info">
+                        <div class="book-title">${book.title}</div>
+                        <div class="book-author">${book.author}</div>
+                    </div>
+                </div>
+                <div class="book-meta">
+                    ${book.current_price ? `<span class="price-tag">$${book.current_price.toFixed(2)}</span>` : ''}
+                    ${book.rating ? `<span class="rating-tag">⭐ ${book.rating.toFixed(1)}</span>` : ''}
+                    ${book.page_count ? `<span class="meta-item">${book.page_count} pages</span>` : ''}
+                </div>
+                <div class="book-actions">
+                    <button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); getPricingSuggestion(${book.id})">💡 Price Suggestion</button>
+                    <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation(); deleteBook(${book.id})">🗑️ Delete</button>
+                </div>
+            </div>
+        `).join('');
+    } catch (error) {
+        console.error('Error loading books:', error);
+    }
+}
+
+async function searchBooks() {
+    const query = document.getElementById('searchInput').value.trim();
+    
+    if (!query) {
+        alert('Please enter a search term');
+        return;
+    }
+    
+    const searchResults = document.getElementById('searchResults');
+    searchResults.innerHTML = '<p>Searching...</p>';
+    
+    try {
+        const response = await fetch('/api/search-book', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query })
+        });
+        
+        const data = await response.json();
+        
+        if (data.books.length === 0) {
+            searchResults.innerHTML = '<p>No books found</p>';
+            return;
+        }
+        
+        searchResults.innerHTML = data.books.map(book => `
+            <div class="book-card">
+                <div class="book-header">
+                    ${book.thumbnail_url ? `<img src="${book.thumbnail_url}" alt="${book.title}" class="book-thumbnail">` : '<div class="book-thumbnail"></div>'}
+                    <div class="book-info">
+                        <div class="book-title">${book.title}</div>
+                        <div class="book-author">${book.author}</div>
+                    </div>
+                </div>
+                <div class="book-meta">
+                    ${book.price ? `<span class="price-tag">$${book.price.toFixed(2)}</span>` : ''}
+                    ${book.rating ? `<span class="rating-tag">⭐ ${book.rating.toFixed(1)}</span>` : ''}
+                    ${book.page_count ? `<span class="meta-item">${book.page_count} pages</span>` : ''}
+                    ${book.category ? `<span class="meta-item">${book.category}</span>` : ''}
+                </div>
+                <button class="btn btn-primary" onclick='addBook(${JSON.stringify(book)})'>+ Add to Tracker</button>
+            </div>
+        `).join('');
+    } catch (error) {
+        console.error('Error searching books:', error);
+        searchResults.innerHTML = '<p>Error searching books</p>';
+    }
+}
+
+function filterBooks() {
+    const filter = document.getElementById('filterInput').value.toLowerCase();
+    const bookCards = document.querySelectorAll('#booksList .book-card');
+    
+    bookCards.forEach(card => {
+        const text = card.textContent.toLowerCase();
+        card.style.display = text.includes(filter) ? 'block' : 'none';
+    });
+}
+
+async function calculateProfit() {
+    const format = document.getElementById('formatSelect').value;
+    const price = parseFloat(document.getElementById('priceInput').value);
+    
+    const data = { price, format };
+    
+    if (format === 'ebook') {
+        data.file_size = parseFloat(document.getElementById('fileSizeInput').value);
+    } else if (format === 'paperback') {
+        data.printing_cost = parseFloat(document.getElementById('printCostInput').value);
+    } else if (format === 'hardcover') {
+        data.printing_cost = parseFloat(document.getElementById('hardcoverCostInput').value);
+    }
+    
+    try {
+        const response = await fetch('/api/profit-calculator', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok) {
+            const resultsDiv = document.getElementById('profitResults');
+            resultsDiv.innerHTML = `
+                <h3>Profit Analysis</h3>
+                <div class="profit-card">
+                    <p><strong>Profit Per Sale:</strong> $${result.profit_per_sale.toFixed(2)}</p>
+                    <p><strong>Royalty Rate:</strong> ${result.royalty_rate}%</p>
+                    ${result.delivery_cost ? `<p><strong>Delivery Cost:</strong> $${result.delivery_cost.toFixed(2)}</p>` : ''}
+                    ${result.printing_cost ? `<p><strong>Printing Cost:</strong> $${result.printing_cost.toFixed(2)}</p>` : ''}
+                    <hr>
+                    <p><strong>Recommended Price Range:</strong></p>
+                    <p>$${result.recommended_range.min} - $${result.recommended_range.max}</p>
+                    <p><em>${result.recommended_range.reason}</em></p>
+                </div>
+            `;
+        } else {
+            alert(result.error);
+        }
+    } catch (error) {
+        console.error('Error calculating profit:', error);
+        alert('Error calculating profit');
+    }
+}
+
+async function loadWatchlists() {
+    try {
+        const response = await fetch('/api/watchlists');
+        const data = await response.json();
+        
+        const watchlistsList = document.getElementById('watchlistsList');
+        
+        if (data.watchlists.length === 0) {
+            watchlistsList.innerHTML = '<p>No watchlists yet. Create one to organize your books!</p>';
+            return;
+        }
+        
+        watchlistsList.innerHTML = data.watchlists.map(wl => `
+            <div class="book-card" onclick="viewWatchlist(${wl.id})">
+                <h3>${wl.name}</h3>
+                <p>${wl.description || 'No description'}</p>
+                <p><strong>${wl.book_count}</strong> books</p>
+            </div>
+        `).join('');
+    } catch (error) {
+        console.error('Error loading watchlists:', error);
+    }
+}
+
+async function loadNotifications() {
+    try {
+        const response = await fetch('/api/notifications');
+        const data = await response.json();
+        
+        const notificationList = document.getElementById('notificationList');
+        
+        if (data.notifications.length === 0) {
+            notificationList.innerHTML = '<p>No notifications</p>';
+            return;
+        }
+        
+        notificationList.innerHTML = data.notifications.map(notif => `
+            <div class="notification-item ${notif.is_read ? 'read' : 'unread'}" onclick="markNotificationRead(${notif.id})">
+                <p><strong>${notif.title}</strong> - ${notif.author}</p>
+                <p>${notif.message}</p>
+                <small>${new Date(notif.created_date).toLocaleDateString()}</small>
+            </div>
+        `).join('');
+    } catch (error) {
+        console.error('Error loading notifications:', error);
+    }
+}
+
+async function viewBookDetails(bookId) {
+    try {
+        const response = await fetch(`/api/book/${bookId}`);
+        const data = await response.json();
+        
+        const book = data.book;
+        const history = data.history;
+        
+        const modal = document.getElementById('bookModal');
+        const details = document.getElementById('bookDetails');
+        
+        details.innerHTML = `
+            <h2>${book.title}</h2>
+            <p><strong>Author:</strong> ${book.author}</p>
+            <p><strong>Current Price:</strong> ${book.current_price ? `$${book.current_price.toFixed(2)}` : 'N/A'}</p>
+            <p><strong>Rating:</strong> ${book.rating ? `${book.rating.toFixed(1)} ⭐` : 'N/A'}</p>
+            <p><strong>Reviews:</strong> ${book.reviews_count || 'N/A'}</p>
+            <p><strong>Pages:</strong> ${book.page_count || 'N/A'}</p>
+            <p><strong>Category:</strong> ${book.category || 'N/A'}</p>
+            <p><strong>Publisher:</strong> ${book.publisher || 'N/A'}</p>
+            <p><strong>Published:</strong> ${book.published_date || 'N/A'}</p>
+            ${book.description ? `<p><strong>Description:</strong> ${book.description}</p>` : ''}
+            ${history.length > 0 ? '<canvas id="priceChart"></canvas>' : ''}
+        `;
+        
+        modal.style.display = 'block';
+        
+        if (history.length > 0) {
+            setTimeout(() => {
+                const ctx = document.getElementById('priceChart').getContext('2d');
+                if (currentChart) currentChart.destroy();
+                
+                currentChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: history.map(h => new Date(h.snapshot_date).toLocaleDateString()),
+                        datasets: [{
+                            label: 'Price',
+                            data: history.map(h => h.price),
+                            borderColor: 'rgb(75, 192, 192)',
+                            tension: 0.1
+                        }, {
+                            label: 'Rating',
+                            data: history.map(h => h.rating),
+                            borderColor: 'rgb(255, 159, 64)',
+                            tension: 0.1,
+                            yAxisID: 'y1'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                type: 'linear',
+                                display: true,
+                                position: 'left'
+                            },
+                            y1: {
+                                type: 'linear',
+                                display: true,
+                                position: 'right',
+                                grid: {
+                                    drawOnChartArea: false
+                                }
+                            }
+                        }
+                    }
+                });
+            }, 100);
+        }
+    } catch (error) {
+        console.error('Error loading book details:', error);
+    }
+}
+
+async function getPricingSuggestion(bookId) {
+    try {
+        const response = await fetch(`/api/pricing-suggestion/${bookId}`);
+        const data = await response.json();
+        
+        alert(`Pricing Suggestion:\n\nSuggested Price: $${data.suggested_price}\nRange: $${data.min_price} - $${data.max_price}\n\n${data.analysis.reasoning}\nCompetitors: ${data.analysis.competitor_count}`);
+    } catch (error) {
+        console.error('Error getting pricing suggestion:', error);
+        alert('Error getting pricing suggestion');
+    }
+}
+
+async function deleteBook(bookId) {
+    if (!confirm('Are you sure you want to delete this book?')) return;
+    
+    try {
+        await fetch(`/api/book/${bookId}`, { method: 'DELETE' });
+        loadBooks();
+        loadStats();
+    } catch (error) {
+        console.error('Error deleting book:', error);
+        alert('Error deleting book');
+    }
+}
+
+async function viewWatchlist(watchlistId) {
+    try {
+        const response = await fetch(`/api/watchlist/${watchlistId}/books`);
+        const data = await response.json();
+        
+        alert(`Watchlist contains ${data.books.length} books. Full watchlist view coming soon!`);
+    } catch (error) {
+        console.error('Error loading watchlist:', error);
+    }
+}
+
+async function markNotificationRead(notificationId) {
+    try {
+        await fetch(`/api/notifications/${notificationId}/read`, { method: 'POST' });
+        loadNotifications();
+        loadStats();
+    } catch (error) {
+        console.error('Error marking notification as read:', error);
+    }
+}
+
+function initDarkMode() {
+    const darkMode = localStorage.getItem('darkMode') === 'true';
+    if (darkMode) {
+        document.body.classList.add('dark-mode');
+    }
+}
+
+function toggleDarkMode() {
+    document.body.classList.toggle('dark-mode');
+    localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
 }
