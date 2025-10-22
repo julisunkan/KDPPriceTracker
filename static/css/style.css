@@ -775,6 +775,32 @@ header {
     font-size: 0.9rem;
 }
 
+.watchlist-options-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.watchlist-option {
+    padding: 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: var(--card-bg);
+}
+
+.watchlist-option:hover {
+    background: var(--hover-bg);
+    border-color: var(--primary-color);
+    transform: translateX(5px);
+}
+
+.watchlist-card {
+    position: relative;
+}
+
 .inline-message-success {
     border-left-color: var(--success-color);
     background: rgba(16, 185, 129, 0.1);

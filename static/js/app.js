@@ -560,10 +560,15 @@ function displayWatchlists(watchlists) {
     }
 
     container.innerHTML = watchlists.map(watchlist => `
-        <div class="watchlist-card" onclick="viewWatchlist(${watchlist.id})">
-            <div class="watchlist-name">${watchlist.name}</div>
-            <div class="watchlist-count">${watchlist.book_count} books</div>
-            ${watchlist.description ? `<p style="margin-top: 10px; color: var(--text-secondary);">${watchlist.description}</p>` : ''}
+        <div class="watchlist-card" data-watchlist-id="${watchlist.id}">
+            <div onclick="viewWatchlist(${watchlist.id})" style="cursor: pointer;">
+                <div class="watchlist-name">${watchlist.name}</div>
+                <div class="watchlist-count">${watchlist.book_count} books</div>
+                ${watchlist.description ? `<p style="margin-top: 10px; color: var(--text-secondary);">${watchlist.description}</p>` : ''}
+            </div>
+            <div style="margin-top: 15px;">
+                <button class="btn btn-danger btn-sm" onclick="event.stopPropagation(); deleteWatchlist(${watchlist.id})">Delete Watchlist</button>
+            </div>
         </div>
     `).join('');
 }
@@ -973,6 +978,7 @@ async function loadBooks() {
                 </div>
                 <div class="book-actions">
                     <button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); getPricingSuggestion(${book.id})">💡 Price Suggestion</button>
+                    <button class="btn btn-success btn-sm" onclick="event.stopPropagation(); showAddToWatchlistModal(${book.id}, '${book.title.replace(/'/g, "\\'")}')">📋 Add to Watchlist</button>
                     <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation(); deleteBook(${book.id})">🗑️ Delete</button>
                 </div>
             </div>
@@ -1430,4 +1436,98 @@ function initDarkMode() {
 function toggleDarkMode() {
     document.body.classList.toggle('dark-mode');
     localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+}
+
+async function deleteWatchlist(watchlistId) {
+    const watchlistCard = document.querySelector(`[data-watchlist-id="${watchlistId}"]`);
+    if (!watchlistCard) return;
+
+    if (watchlistCard.querySelector('.delete-confirmation')) return;
+
+    const confirmationDiv = document.createElement('div');
+    confirmationDiv.className = 'inline-message inline-message-warning show delete-confirmation';
+    confirmationDiv.innerHTML = `
+        <span>Delete this watchlist?</span>
+        <div style="display: flex; gap: 10px; margin-left: auto;">
+            <button class="btn btn-danger btn-sm" onclick="confirmDeleteWatchlist(${watchlistId})">Delete</button>
+            <button class="btn btn-secondary btn-sm" onclick="cancelDeleteWatchlist(${watchlistId})">Cancel</button>
+        </div>
+    `;
+
+    watchlistCard.insertBefore(confirmationDiv, watchlistCard.lastElementChild);
+}
+
+async function confirmDeleteWatchlist(watchlistId) {
+    try {
+        await fetch(`/api/watchlist/${watchlistId}`, { method: 'DELETE' });
+        showToast('Watchlist deleted successfully', 'success');
+        loadWatchlists();
+    } catch (error) {
+        console.error('Error deleting watchlist:', error);
+        showToast('Error deleting watchlist', 'error');
+    }
+}
+
+function cancelDeleteWatchlist(watchlistId) {
+    const watchlistCard = document.querySelector(`[data-watchlist-id="${watchlistId}"]`);
+    if (!watchlistCard) return;
+
+    const confirmation = watchlistCard.querySelector('.delete-confirmation');
+    if (confirmation) {
+        confirmation.remove();
+    }
+}
+
+async function showAddToWatchlistModal(bookId, bookTitle) {
+    try {
+        const response = await fetch('/api/watchlists');
+        const data = await response.json();
+
+        if (data.watchlists.length === 0) {
+            showToast('Please create a watchlist first', 'info');
+            return;
+        }
+
+        const watchlistOptions = data.watchlists.map(wl => 
+            `<div class="watchlist-option" onclick="addBookToWatchlist(${wl.id}, ${bookId})">
+                <div class="watchlist-name">${wl.name}</div>
+                <div class="watchlist-count">${wl.book_count} books</div>
+            </div>`
+        ).join('');
+
+        const modalHTML = `
+            <h2>Add "${bookTitle}" to Watchlist</h2>
+            <div class="watchlist-options-container">
+                ${watchlistOptions}
+            </div>
+        `;
+
+        document.getElementById('bookDetails').innerHTML = modalHTML;
+        document.getElementById('bookModal').style.display = 'block';
+    } catch (error) {
+        console.error('Error loading watchlists:', error);
+        showToast('Error loading watchlists', 'error');
+    }
+}
+
+async function addBookToWatchlist(watchlistId, bookId) {
+    try {
+        const response = await fetch(`/api/watchlist/${watchlistId}/add-book`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ book_id: bookId })
+        });
+
+        if (response.ok) {
+            showToast('Book added to watchlist successfully', 'success');
+            document.getElementById('bookModal').style.display = 'none';
+            loadWatchlists();
+        } else {
+            const error = await response.json();
+            showToast(error.error || 'Error adding book to watchlist', 'error');
+        }
+    } catch (error) {
+        console.error('Error adding book to watchlist:', error);
+        showToast('Error adding book to watchlist', 'error');
+    }
 }

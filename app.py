@@ -487,6 +487,17 @@ def remove_book_from_watchlist(watchlist_id, book_id):
     
     return jsonify({'success': True})
 
+@app.route('/api/watchlist/<int:watchlist_id>', methods=['DELETE'])
+def delete_watchlist(watchlist_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    cursor.execute('DELETE FROM watchlists WHERE id = ?', (watchlist_id,))
+    conn.commit()
+    conn.close()
+    
+    return jsonify({'success': True})
+
 @app.route('/api/notifications', methods=['GET'])
 def get_notifications():
     conn = get_db_connection()
