@@ -1,0 +1,102 @@
+Build a Progressive Web App (PWA) using Python (Flask) and SQLite, named KDP Books Price Tracker & Competitor Monitor.
+The web app will track KDP (Kindle Direct Publishing) books’ prices, monitor competitors, and provide AI-based pricing insights.
+
+⚙️ Core Requirements:
+
+Use Flask as the backend and SQLite as the database.
+
+Use HTML, CSS, and JavaScript for the frontend.
+
+Use Chart.js for displaying price/rating trends.
+
+App must work offline as a PWA, with:
+
+manifest.json
+
+service-worker.js (for caching)
+
+Use only free APIs (Google Books API or Open Library API) to fetch book details.
+
+Include no user login or registration (everything stored locally in SQLite).
+
+Support AI-based pricing suggestions using local heuristic logic (scikit-learn optional, but no paid AI API).
+
+Include profit margin calculator (based on KDP royalty rules: 35% or 70%).
+
+Include historical analytics with charts (price & rating trends).
+
+Allow custom watchlists by genre or author.
+
+Include multi-author support (switch profiles locally).
+
+Allow CSV/PDF export of tracked data.
+
+Include dark mode toggle and responsive design.
+
+Ensure all dependencies are free and open-source.
+
+🧩 Main Features to Implement:
+
+Book Tracking
+
+Add book via title, author, or ISBN/ASIN.
+
+Fetch details via Google Books or Open Library API.
+
+Store title, author, price, rating, and category in SQLite.
+
+Show competitor list and highlight changes.
+
+AI Pricing Suggestion
+
+Analyze tracked books within the same genre.
+
+Suggest optimal price based on:
+
+Average competitor price
+
+Page count & rating
+
+Publication age
+
+Use a rule-based or linear regression model (local, no API).
+
+Profit Calculator
+
+Compute KDP royalties based on price and format (Kindle or Paperback).
+
+Display profit per sale and suggest best pricing range.
+
+Historical Data
+
+Store daily snapshots (price, rating, reviews).
+
+Display trend charts using Chart.js.
+
+Custom Watchlists
+
+Create watchlists for genres or authors.
+
+Assign books to watchlists.
+
+Offline PWA
+
+Include manifest.json with name, icons, and theme color.
+
+Include service-worker.js to cache assets and enable offline view.
+
+Export
+
+Export book history to CSV or PDF (using pandas and reportlab).
+
+UI Enhancements
+
+Dark mode toggle
+
+Responsive dashboard
+
+Notifications for price/rating changes
+
+
+✅ End Goal:
+A fully functional offline-capable, AI-assisted KDP Book Price Tracker PWA that helps authors and publishers analyze competitor pricing trends, suggest optimal pricing, calculate royalties, and visualize long-term analytics — all without paid APIs or login systems.
