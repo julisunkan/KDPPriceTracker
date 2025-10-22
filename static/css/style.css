@@ -961,50 +961,120 @@ header {
     justify-content: flex-end;
 }
 
+/* Export View Styles */
+.export-view-container {
+    padding: 40px 20px;
+    background: var(--bg-primary);
+    border-radius: 15px;
+    box-shadow: var(--shadow-lg);
+    margin-top: 30px;
+}
+
+.export-view-header {
+    text-align: center;
+    margin-bottom: 30px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 20px;
+}
+
+.export-view-header h2 {
+    font-size: 2.5rem;
+    color: var(--accent-color);
+    margin-bottom: 10px;
+}
+
+.export-view-header p {
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+}
+
+.pdf-viewer,
+.csv-viewer {
+    width: 100%;
+    height: 70vh;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.pdf-viewer iframe,
+.csv-viewer iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+.export-actions {
+    text-align: center;
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.export-actions .btn {
+    padding: 12px 30px;
+}
+
+
 @media (max-width: 768px) {
     .header-content h1 {
         font-size: 1.5rem;
     }
-    
+
     .tabs {
         overflow-x: auto;
         flex-wrap: nowrap;
     }
-    
+
     .books-grid,
     .watchlists-grid,
     .search-results {
         grid-template-columns: 1fr;
     }
-    
+
     .modal-content {
         width: 95%;
         margin: 20px auto;
         padding: 20px;
     }
-    
+
     .notification-panel {
         width: 100%;
         right: -100%;
     }
-    
+
     .export-buttons {
         flex-direction: column;
     }
-    
+
     .toast-container {
         top: 10px;
         right: 10px;
         left: 10px;
     }
-    
+
     .toast {
         min-width: auto;
         max-width: 100%;
     }
-    
+
     .confirm-dialog {
         margin: 20px;
         max-width: calc(100% - 40px);
+    }
+
+    .export-view-header h2 {
+        font-size: 2rem;
+    }
+
+    .export-view-header p {
+        font-size: 1rem;
+    }
+
+    .pdf-viewer,
+    .csv-viewer {
+        height: 50vh;
     }
 }

@@ -529,10 +529,19 @@ def mark_notification_read(notification_id):
 
 @app.route('/api/export/csv', methods=['GET'])
 def export_csv():
+    view_mode = request.args.get('view', 'false').lower() == 'true'
     conn = get_db_connection()
     
     df = pd.read_sql_query('SELECT * FROM books', conn)
     conn.close()
+    
+    if view_mode:
+        # Render CSV as HTML table
+        html_table = df.to_html(classes='csv-table', index=False, border=0)
+        return render_template('export_view.html', 
+                             export_type='CSV',
+                             content=html_table,
+                             filename=f'kdp_books_{datetime.now().strftime("%Y%m%d")}.csv')
     
     output = io.BytesIO()
     df.to_csv(output, index=False)
@@ -547,6 +556,7 @@ def export_csv():
 
 @app.route('/api/export/pdf', methods=['GET'])
 def export_pdf():
+    view_mode = request.args.get('view', 'false').lower() == 'true'
     conn = get_db_connection()
     cursor = conn.cursor()
     
@@ -595,6 +605,16 @@ def export_pdf():
     doc.build(elements)
     
     buffer.seek(0)
+    
+    if view_mode:
+        # Return PDF to be viewed inline
+        return send_file(
+            buffer,
+            mimetype='application/pdf',
+            as_attachment=False,
+            download_name=f'kdp_books_{datetime.now().strftime("%Y%m%d")}.pdf'
+        )
+    
     return send_file(
         buffer,
         mimetype='application/pdf',
