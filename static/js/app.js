@@ -1124,11 +1124,142 @@ async function getPricingSuggestion(bookId) {
         const response = await fetch(`/api/pricing-suggestion/${bookId}`);
         const data = await response.json();
 
-        alert(`Pricing Suggestion:\n\nSuggested Price: $${data.suggested_price}\nRange: $${data.min_price} - $${data.max_price}\n\n${data.analysis.reasoning}\nCompetitors: ${data.analysis.competitor_count}`);
+        const bookResponse = await fetch(`/api/book/${bookId}`);
+        const bookData = await bookResponse.json();
+        const book = bookData.book;
+
+        const suggestionHTML = `
+            <h2>💡 Pricing Suggestion for "${book.title}"</h2>
+            
+            <div class="pricing-suggestion-container">
+                <div class="suggested-price-card">
+                    <h3>Recommended Price</h3>
+                    <div class="suggestion-price">$${data.suggested_price}</div>
+                    <p class="price-range">Range: $${data.min_price} - $${data.max_price}</p>
+                </div>
+
+                <div class="analysis-section">
+                    <h3>📊 Market Analysis</h3>
+                    <div class="analysis-grid">
+                        <div class="analysis-item">
+                            <span class="analysis-label">Competitors Analyzed:</span>
+                            <span class="analysis-value">${data.analysis.competitor_count}</span>
+                        </div>
+                        ${data.analysis.avg_competitor_price ? `
+                            <div class="analysis-item">
+                                <span class="analysis-label">Avg Competitor Price:</span>
+                                <span class="analysis-value">$${data.analysis.avg_competitor_price}</span>
+                            </div>
+                        ` : ''}
+                        ${data.analysis.avg_competitor_rating ? `
+                            <div class="analysis-item">
+                                <span class="analysis-label">Avg Competitor Rating:</span>
+                                <span class="analysis-value">${data.analysis.avg_competitor_rating} ⭐</span>
+                            </div>
+                        ` : ''}
+                        ${data.analysis.price_range ? `
+                            <div class="analysis-item">
+                                <span class="analysis-label">Market Price Range:</span>
+                                <span class="analysis-value">${data.analysis.price_range}</span>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+
+                <div class="reasoning-section">
+                    <h3>🎯 Reasoning</h3>
+                    <p class="reasoning-text">${data.analysis.reasoning}</p>
+                </div>
+
+                <div class="current-info-section">
+                    <h3>📖 Current Book Info</h3>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Current Price:</span>
+                            <span class="info-value">${book.current_price ? `$${book.current_price.toFixed(2)}` : 'Not set'}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Rating:</span>
+                            <span class="info-value">${book.rating ? `${book.rating.toFixed(1)} ⭐` : 'N/A'}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Pages:</span>
+                            <span class="info-value">${book.page_count || 'N/A'}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Category:</span>
+                            <span class="info-value">${book.category || 'N/A'}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="action-section">
+                    <button class="btn btn-primary" onclick="applyPriceSuggestion(${bookId}, ${data.suggested_price})">
+                        Apply Suggested Price
+                    </button>
+                </div>
+            </div>
+        `;
+
+        document.getElementById('bookDetails').innerHTML = suggestionHTML;
+        document.getElementById('bookModal').style.display = 'block';
     } catch (error) {
         console.error('Error getting pricing suggestion:', error);
-        alert('Error getting pricing suggestion');
+        showToast('Error getting pricing suggestion', 'error');
     }
+}
+
+async function applyPriceSuggestion(bookId, suggestedPrice) {
+    const confirmed = confirm(`Apply suggested price of $${suggestedPrice}?`);
+    if (!confirmed) return;
+
+    try {
+        const bookResponse = await fetch(`/api/book/${bookId}`);
+        const bookData = await bookResponse.json();
+        const book = bookData.book;
+
+        const response = await fetch(`/api/update-price/${bookId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                price: suggestedPrice,
+                rating: book.rating,
+                reviews_count: book.reviews_count
+            })
+        });
+
+        if (response.ok) {
+            showToast('Price updated successfully!', 'success');
+            document.getElementById('bookModal').style.display = 'none';
+            loadBooks();
+            loadStats();
+        } else {
+            showToast('Error updating price', 'error');
+        }
+    } catch (error) {
+        console.error('Error applying price suggestion:', error);
+        showToast('Error applying price suggestion', 'error');
+    }
+}
+
+function showToast(message, type = 'info') {
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type} show`;
+    toast.textContent = message;
+    
+    let container = document.querySelector('.toast-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.className = 'toast-container';
+        document.body.appendChild(container);
+    }
+    
+    container.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
 }
 
 async function deleteBook(bookId) {

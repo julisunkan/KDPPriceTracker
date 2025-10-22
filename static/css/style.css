@@ -587,6 +587,99 @@ header {
     margin: 10px 0;
 }
 
+/* Pricing Suggestion Modal Styles */
+.pricing-suggestion-container {
+    padding: 20px 0;
+}
+
+.suggested-price-card {
+    background: linear-gradient(135deg, var(--accent-color), var(--success-color));
+    color: white;
+    padding: 30px;
+    border-radius: 12px;
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.suggested-price-card h3 {
+    margin: 0 0 15px 0;
+    font-size: 1.2rem;
+    opacity: 0.95;
+}
+
+.suggested-price-card .suggestion-price {
+    font-size: 3rem;
+    font-weight: bold;
+    color: white;
+    margin: 15px 0;
+}
+
+.price-range {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin: 10px 0 0 0;
+}
+
+.analysis-section,
+.reasoning-section,
+.current-info-section {
+    background: var(--bg-secondary);
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.analysis-section h3,
+.reasoning-section h3,
+.current-info-section h3 {
+    margin: 0 0 15px 0;
+    color: var(--text-primary);
+}
+
+.analysis-grid,
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+.analysis-item,
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    background: var(--bg-primary);
+    border-radius: 6px;
+}
+
+.analysis-label,
+.info-label {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.analysis-value,
+.info-value {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.reasoning-text {
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin: 0;
+}
+
+.action-section {
+    text-align: center;
+    margin-top: 25px;
+}
+
+.action-section .btn {
+    padding: 12px 30px;
+    font-size: 1rem;
+}
+
 /* Toast notifications */
 .toast-container {
     position: fixed;
