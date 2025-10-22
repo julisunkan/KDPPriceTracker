@@ -746,6 +746,16 @@ header {
     transform: translateY(0);
 }
 
+.delete-confirmation {
+    margin-top: 15px;
+    margin-bottom: 10px;
+}
+
+.delete-confirmation .btn {
+    padding: 6px 12px;
+    font-size: 0.9rem;
+}
+
 .inline-message-success {
     border-left-color: var(--success-color);
     background: rgba(16, 185, 129, 0.1);

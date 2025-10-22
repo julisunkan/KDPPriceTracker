@@ -1263,15 +1263,47 @@ function showToast(message, type = 'info') {
 }
 
 async function deleteBook(bookId) {
-    if (!confirm('Are you sure you want to delete this book?')) return;
+    const bookCard = document.querySelector(`[data-book-id="${bookId}"]`);
+    if (!bookCard) return;
 
+    // Check if confirmation already exists
+    if (bookCard.querySelector('.delete-confirmation')) return;
+
+    // Create inline confirmation
+    const confirmationDiv = document.createElement('div');
+    confirmationDiv.className = 'inline-message inline-message-warning show delete-confirmation';
+    confirmationDiv.innerHTML = `
+        <span>Are you sure you want to delete this book?</span>
+        <div style="display: flex; gap: 10px; margin-left: auto;">
+            <button class="btn btn-danger btn-sm" onclick="confirmDeleteBook(${bookId})">Delete</button>
+            <button class="btn btn-secondary btn-sm" onclick="cancelDeleteBook(${bookId})">Cancel</button>
+        </div>
+    `;
+
+    // Insert before book actions
+    const bookActions = bookCard.querySelector('.book-actions');
+    bookCard.insertBefore(confirmationDiv, bookActions);
+}
+
+async function confirmDeleteBook(bookId) {
     try {
         await fetch(`/api/book/${bookId}`, { method: 'DELETE' });
+        showToast('Book deleted successfully', 'success');
         loadBooks();
         loadStats();
     } catch (error) {
         console.error('Error deleting book:', error);
-        alert('Error deleting book');
+        showToast('Error deleting book', 'error');
+    }
+}
+
+function cancelDeleteBook(bookId) {
+    const bookCard = document.querySelector(`[data-book-id="${bookId}"]`);
+    if (!bookCard) return;
+
+    const confirmation = bookCard.querySelector('.delete-confirmation');
+    if (confirmation) {
+        confirmation.remove();
     }
 }
 
