@@ -704,45 +704,95 @@ async function viewWatchlist(watchlistId) {
         const watchlistsData = await watchlistsResponse.json();
         const watchlist = watchlistsData.watchlists.find(w => w.id === watchlistId);
 
+        // Calculate statistics
+        const totalBooks = data.books.length;
+        const avgPrice = totalBooks > 0 
+            ? data.books.reduce((sum, book) => sum + (book.current_price || 0), 0) / totalBooks 
+            : 0;
+        const avgRating = totalBooks > 0 
+            ? data.books.reduce((sum, book) => sum + (book.rating || 0), 0) / totalBooks 
+            : 0;
+        const totalValue = data.books.reduce((sum, book) => sum + (book.current_price || 0), 0);
+
         const watchlistHTML = `
-            <h2>${watchlist.name}</h2>
-            ${watchlist.description ? `<p class="watchlist-description">${watchlist.description}</p>` : ''}
-            <p class="watchlist-book-count">${data.books.length} books in this watchlist</p>
-            
-            ${data.books.length === 0 ? `
-                <div class="empty-state" style="margin-top: 30px;">
-                    <p>📚 No books in this watchlist yet</p>
-                    <p>Add books from your tracked books to organize them here</p>
-                </div>
-            ` : `
-                <div class="watchlist-books-grid">
-                    ${data.books.map(book => `
-                        <div class="book-card" data-book-id="${book.id}">
-                            <div class="book-header">
-                                ${book.thumbnail_url ? 
-                                    `<img src="${book.thumbnail_url}" alt="${book.title}" class="book-thumbnail">` :
-                                    `<div class="book-thumbnail">📚</div>`
-                                }
-                                <div class="book-info">
-                                    <div class="book-title">${book.title}</div>
-                                    <div class="book-author">by ${book.author}</div>
-                                </div>
-                            </div>
-
-                            <div class="book-meta">
-                                ${book.current_price ? `<span class="price-tag">$${book.current_price.toFixed(2)}</span>` : ''}
-                                ${book.rating ? `<span class="rating-tag">⭐ ${book.rating.toFixed(1)}</span>` : ''}
-                                ${book.page_count ? `<span class="meta-item">${book.page_count} pages</span>` : ''}
-                            </div>
-
-                            <div class="book-actions">
-                                <button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); viewBookDetails(${book.id})">View Details</button>
-                                <button class="btn btn-danger btn-sm" onclick="event.stopPropagation(); removeFromWatchlist(${watchlistId}, ${book.id})">Remove</button>
-                            </div>
+            <div class="watchlist-view">
+                <div class="watchlist-header-section">
+                    <h2>📋 ${watchlist.name}</h2>
+                    ${watchlist.description ? `<p class="watchlist-description">${watchlist.description}</p>` : ''}
+                    
+                    <div class="watchlist-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">${totalBooks}</div>
+                            <div class="stat-label">Books</div>
                         </div>
-                    `).join('')}
+                        <div class="stat-item">
+                            <div class="stat-value">$${avgPrice.toFixed(2)}</div>
+                            <div class="stat-label">Avg Price</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">${avgRating.toFixed(1)}</div>
+                            <div class="stat-label">Avg Rating</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">$${totalValue.toFixed(2)}</div>
+                            <div class="stat-label">Total Value</div>
+                        </div>
+                    </div>
                 </div>
-            `}
+                
+                ${data.books.length === 0 ? `
+                    <div class="empty-state" style="margin-top: 30px;">
+                        <p>📚 No books in this watchlist yet</p>
+                        <p>Add books from your tracked books to organize them here</p>
+                    </div>
+                ` : `
+                    <div class="watchlist-books-section">
+                        <h3>Books in this Watchlist</h3>
+                        <div class="watchlist-books-grid">
+                            ${data.books.map(book => `
+                                <div class="book-card watchlist-book-card" data-book-id="${book.id}">
+                                    <div class="book-header">
+                                        ${book.thumbnail_url ? 
+                                            `<img src="${book.thumbnail_url}" alt="${book.title}" class="book-thumbnail">` :
+                                            `<div class="book-thumbnail">📚</div>`
+                                        }
+                                        <div class="book-info">
+                                            <div class="book-title">${book.title}</div>
+                                            <div class="book-author">by ${book.author}</div>
+                                            ${book.category ? `<div class="book-category">${book.category}</div>` : ''}
+                                        </div>
+                                    </div>
+
+                                    <div class="book-meta">
+                                        ${book.current_price ? `<span class="price-tag">$${book.current_price.toFixed(2)}</span>` : ''}
+                                        ${book.rating ? `<span class="rating-tag">⭐ ${book.rating.toFixed(1)}</span>` : ''}
+                                        ${book.page_count ? `<span class="meta-item">📄 ${book.page_count} pages</span>` : ''}
+                                        ${book.publisher ? `<span class="meta-item">📚 ${book.publisher}</span>` : ''}
+                                    </div>
+
+                                    ${book.description ? `
+                                        <div class="book-description">
+                                            ${book.description.substring(0, 150)}${book.description.length > 150 ? '...' : ''}
+                                        </div>
+                                    ` : ''}
+
+                                    <div class="book-actions">
+                                        <button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); viewBookDetails(${book.id})">
+                                            📊 View Details
+                                        </button>
+                                        <button class="btn btn-success btn-sm" onclick="event.stopPropagation(); getPricingSuggestion(${book.id})">
+                                            💡 Pricing
+                                        </button>
+                                        <button class="btn btn-danger btn-sm" onclick="event.stopPropagation(); removeFromWatchlist(${watchlistId}, ${book.id})">
+                                            ❌ Remove
+                                        </button>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `}
+            </div>
         `;
 
         document.getElementById('bookDetails').innerHTML = watchlistHTML;

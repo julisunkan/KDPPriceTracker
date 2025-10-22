@@ -801,6 +801,97 @@ header {
     position: relative;
 }
 
+/* Full Watchlist View Styles */
+.watchlist-view {
+    padding: 10px 0;
+}
+
+.watchlist-header-section {
+    margin-bottom: 30px;
+}
+
+.watchlist-header-section h2 {
+    font-size: 2rem;
+    margin-bottom: 15px;
+    color: var(--accent-color);
+}
+
+.watchlist-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.watchlist-stats .stat-item {
+    background: var(--bg-secondary);
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    border: 1px solid var(--border-color);
+}
+
+.watchlist-stats .stat-value {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: var(--accent-color);
+    margin-bottom: 5px;
+}
+
+.watchlist-stats .stat-label {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.watchlist-books-section {
+    margin-top: 30px;
+}
+
+.watchlist-books-section h3 {
+    font-size: 1.3rem;
+    margin-bottom: 20px;
+    color: var(--text-primary);
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 10px;
+}
+
+.watchlist-book-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    transition: all 0.3s ease;
+}
+
+.watchlist-book-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--accent-color);
+}
+
+.book-category {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    margin-top: 5px;
+    font-style: italic;
+}
+
+.book-description {
+    margin: 12px 0;
+    padding: 10px;
+    background: var(--bg-primary);
+    border-radius: 5px;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    border-left: 3px solid var(--accent-color);
+}
+
+.btn-sm {
+    padding: 8px 12px;
+    font-size: 0.85rem;
+}
+
 .inline-message-success {
     border-left-color: var(--success-color);
     background: rgba(16, 185, 129, 0.1);
