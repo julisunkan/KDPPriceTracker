@@ -373,6 +373,25 @@
         
         // Add smooth scroll behavior
         document.querySelector('html').style.scrollBehavior = 'smooth';
+        
+        // Disable Ctrl+S (Save) in PDF preview
+        document.addEventListener('keydown', function(e) {
+            // Check for Ctrl+S or Cmd+S (Mac)
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+            }
+        }, true);
+        
+        // Also disable right-click context menu on PDF viewer
+        const pdfViewer = document.querySelector('.pdf-viewer');
+        if (pdfViewer) {
+            pdfViewer.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+                return false;
+            });
+        }
     </script>
 </body>
 </html>
