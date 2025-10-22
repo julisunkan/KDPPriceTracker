@@ -5,6 +5,8 @@ description = "Add your description here"
 requires-python = ">=3.11"
 dependencies = [
     "flask>=3.1.2",
+    "gunicorn>=23.0.0",
+    "numpy>=2.3.4",
     "pandas>=2.3.3",
     "reportlab>=4.4.4",
     "requests>=2.32.5",

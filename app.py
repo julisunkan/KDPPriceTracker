@@ -9,12 +9,13 @@ from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, 
 from reportlab.lib.styles import getSampleStyleSheet
 import io
 import json
+import os
 from database import init_db, get_db_connection
 import numpy as np
 from sklearn.linear_model import LinearRegression
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'kdp-tracker-secret-key-2025'
+app.config['SECRET_KEY'] = os.environ.get('SESSION_SECRET', os.urandom(24).hex())
 
 init_db()
 
@@ -594,4 +595,5 @@ def get_stats():
     })
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    debug_mode = os.environ.get('FLASK_DEBUG', 'False').lower() == 'true'
+    app.run(host='0.0.0.0', port=5000, debug=debug_mode)
