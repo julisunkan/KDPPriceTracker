@@ -283,7 +283,7 @@ async function searchBooks() {
         displaySearchResults(data.books);
     } catch (error) {
         console.error('Error searching books:', error);
-        alert('Error searching books. Please try again.');
+        showToast('Error searching books. Please try again.', 'error');
     } finally {
         searchBtn.textContent = 'Search';
         searchBtn.disabled = false;
@@ -334,16 +334,16 @@ async function addBook(bookData) {
         });
 
         if (response.ok) {
-            alert('Book added successfully!');
+            showToast('Book added successfully!', 'success');
             loadBooks();
             loadStats();
         } else {
             const error = await response.json();
-            alert(error.error || 'Error adding book');
+            showToast(error.error || 'Error adding book', 'error');
         }
     } catch (error) {
         console.error('Error adding book:', error);
-        alert('Error adding book. Please try again.');
+        showToast('Error adding book. Please try again.', 'error');
     }
 }
 
@@ -416,7 +416,7 @@ async function viewBookDetails(bookId) {
         }
     } catch (error) {
         console.error('Error loading book details:', error);
-        alert('Error loading book details');
+        showToast('Error loading book details', 'error');
     }
 }
 
@@ -501,39 +501,20 @@ async function updateBookPrice(bookId) {
         });
 
         if (response.ok) {
-            alert('Price updated successfully!');
+            showToast('Price updated successfully!', 'success');
             document.getElementById('bookModal').style.display = 'none';
             loadBooks();
             loadStats();
             loadNotifications();
         } else {
-            alert('Error updating price');
+            showToast('Error updating price', 'error');
         }
     } catch (error) {
         console.error('Error updating price:', error);
-        alert('Error updating price');
+        showToast('Error updating price', 'error');
     }
 }
 
-async function deleteBook(bookId) {
-    if (!confirm('Are you sure you want to delete this book?')) return;
-
-    try {
-        const response = await fetch(`/api/book/${bookId}`, {
-            method: 'DELETE'
-        });
-
-        if (response.ok) {
-            loadBooks();
-            loadStats();
-        } else {
-            alert('Error deleting book');
-        }
-    } catch (error) {
-        console.error('Error deleting book:', error);
-        alert('Error deleting book');
-    }
-}
 
 async function loadWatchlists() {
     try {
@@ -668,7 +649,7 @@ async function createWatchlist() {
     const description = document.getElementById('watchlistDescription').value.trim();
 
     if (!name) {
-        alert('Please enter a name');
+        showToast('Please enter a watchlist name', 'warning');
         return;
     }
 
@@ -683,14 +664,15 @@ async function createWatchlist() {
             document.getElementById('watchlistName').value = '';
             document.getElementById('watchlistDescription').value = '';
             document.getElementById('createWatchlistModal').style.display = 'none';
+            showToast('Watchlist created successfully!', 'success');
             loadWatchlists();
         } else {
             const error = await response.json();
-            alert(error.error || 'Error creating watchlist');
+            showToast(error.error || 'Error creating watchlist', 'error');
         }
     } catch (error) {
         console.error('Error creating watchlist:', error);
-        alert('Error creating watchlist');
+        showToast('Error creating watchlist', 'error');
     }
 }
 
@@ -872,11 +854,22 @@ async function calculateProfit() {
         if (response.ok) {
             displayProfitResults(data);
         } else {
-            alert(data.error || 'Error calculating profit');
+            const resultsDiv = document.getElementById('profitResults');
+            resultsDiv.innerHTML = `
+                <div class="inline-message inline-message-warning show">
+                    <span><strong>⚠️ ${data.error}</strong></span>
+                    ${data.min_price ? `<p style="margin-top: 10px;">Minimum price required: <strong>$${data.min_price}</strong></p>` : ''}
+                </div>
+            `;
         }
     } catch (error) {
         console.error('Error calculating profit:', error);
-        alert('Error calculating profit');
+        const resultsDiv = document.getElementById('profitResults');
+        resultsDiv.innerHTML = `
+            <div class="inline-message inline-message-error show">
+                <span>Error calculating profit. Please try again.</span>
+            </div>
+        `;
     }
 }
 
@@ -1042,7 +1035,7 @@ async function searchBooks() {
     const query = document.getElementById('searchInput').value.trim();
 
     if (!query) {
-        alert('Please enter a search term');
+        showToast('Please enter a search term', 'warning');
         return;
     }
 
