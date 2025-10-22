@@ -527,36 +527,20 @@ def mark_notification_read(notification_id):
     
     return jsonify({'success': True})
 
-@app.route('/api/export/csv', methods=['GET'])
-def export_csv():
-    view_mode = request.args.get('view', 'false').lower() == 'true'
+@app.route('/export/csv')
+def view_csv_export():
     conn = get_db_connection()
-    
     df = pd.read_sql_query('SELECT * FROM books', conn)
     conn.close()
     
-    if view_mode:
-        # Render CSV as HTML table
-        html_table = df.to_html(classes='csv-table', index=False, border=0)
-        return render_template('export_view.html', 
-                             export_type='CSV',
-                             content=html_table,
-                             filename=f'kdp_books_{datetime.now().strftime("%Y%m%d")}.csv')
-    
-    output = io.BytesIO()
-    df.to_csv(output, index=False)
-    output.seek(0)
-    
-    return send_file(
-        output,
-        mimetype='text/csv',
-        as_attachment=True,
-        download_name=f'kdp_books_{datetime.now().strftime("%Y%m%d")}.csv'
-    )
+    html_table = df.to_html(classes='csv-table', index=False, border=0)
+    return render_template('export_view.html', 
+                         export_type='CSV',
+                         content=html_table,
+                         filename=f'kdp_books_{datetime.now().strftime("%Y%m%d")}.csv')
 
-@app.route('/api/export/pdf', methods=['GET'])
-def export_pdf():
-    view_mode = request.args.get('view', 'false').lower() == 'true'
+@app.route('/export/pdf')
+def view_pdf_export():
     conn = get_db_connection()
     cursor = conn.cursor()
     
@@ -606,14 +590,82 @@ def export_pdf():
     
     buffer.seek(0)
     
-    if view_mode:
-        # Return PDF to be viewed inline
-        return send_file(
-            buffer,
-            mimetype='application/pdf',
-            as_attachment=False,
-            download_name=f'kdp_books_{datetime.now().strftime("%Y%m%d")}.pdf'
-        )
+    # Convert PDF to base64 for embedding
+    import base64
+    pdf_base64 = base64.b64encode(buffer.read()).decode('utf-8')
+    
+    return render_template('export_view.html', 
+                         export_type='PDF',
+                         content=pdf_base64,
+                         filename=f'kdp_books_{datetime.now().strftime("%Y%m%d")}.pdf')
+
+@app.route('/api/export/csv', methods=['GET'])
+def download_csv():
+    conn = get_db_connection()
+    df = pd.read_sql_query('SELECT * FROM books', conn)
+    conn.close()
+    
+    output = io.BytesIO()
+    df.to_csv(output, index=False)
+    output.seek(0)
+    
+    return send_file(
+        output,
+        mimetype='text/csv',
+        as_attachment=True,
+        download_name=f'kdp_books_{datetime.now().strftime("%Y%m%d")}.csv'
+    )
+
+@app.route('/api/export/pdf', methods=['GET'])
+def download_pdf():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    cursor.execute('SELECT title, author, current_price, rating, category FROM books')
+    books = cursor.fetchall()
+    conn.close()
+    
+    buffer = io.BytesIO()
+    doc = SimpleDocTemplate(buffer, pagesize=letter)
+    
+    elements = []
+    styles = getSampleStyleSheet()
+    
+    title = Paragraph("KDP Books Price Tracker Report", styles['Title'])
+    elements.append(title)
+    elements.append(Spacer(1, 12))
+    
+    date_para = Paragraph(f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M')}", styles['Normal'])
+    elements.append(date_para)
+    elements.append(Spacer(1, 20))
+    
+    data = [['Title', 'Author', 'Price', 'Rating', 'Category']]
+    
+    for book in books:
+        data.append([
+            book['title'][:30],
+            book['author'][:25],
+            f"${book['current_price']:.2f}" if book['current_price'] else 'N/A',
+            f"{book['rating']:.1f}" if book['rating'] else 'N/A',
+            book['category'][:20] if book['category'] else 'N/A'
+        ])
+    
+    table = Table(data)
+    table.setStyle(TableStyle([
+        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+        ('FONTSIZE', (0, 0), (-1, 0), 10),
+        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+        ('GRID', (0, 0), (-1, -1), 1, colors.black)
+    ]))
+    
+    elements.append(table)
+    doc.build(elements)
+    
+    buffer.seek(0)
     
     return send_file(
         buffer,

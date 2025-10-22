@@ -602,10 +602,10 @@ function initEventListeners() {
 
     // Export
     document.getElementById('exportCSV')?.addEventListener('click', () => {
-        window.open('/api/export/csv?view=true', '_blank', 'width=1200,height=800');
+        window.location.href = '/export/csv';
     });
     document.getElementById('exportPDF')?.addEventListener('click', () => {
-        window.open('/api/export/pdf?view=true', '_blank', 'width=1200,height=800');
+        window.location.href = '/export/pdf';
     });
 
     // Watchlist
