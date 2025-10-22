@@ -786,13 +786,16 @@ async function viewWatchlist(watchlistId) {
 }
 
 async function removeFromWatchlist(watchlistId, bookId) {
-    const bookCard = document.querySelector(`[data-book-id="${bookId}"]`);
-    if (!bookCard) return;
+    const modal = document.getElementById('bookModal');
+    const bookCard = modal.querySelector(`.watchlist-book-card[data-book-id="${bookId}"]`);
+    
+    if (!bookCard) {
+        console.error('Book card not found for bookId:', bookId);
+        return;
+    }
 
-    // Check if confirmation already exists
     if (bookCard.querySelector('.delete-confirmation')) return;
 
-    // Create inline confirmation
     const confirmationDiv = document.createElement('div');
     confirmationDiv.className = 'inline-message inline-message-warning show delete-confirmation';
     confirmationDiv.innerHTML = `
@@ -803,9 +806,10 @@ async function removeFromWatchlist(watchlistId, bookId) {
         </div>
     `;
 
-    // Insert before book actions
     const bookActions = bookCard.querySelector('.book-actions');
-    bookCard.insertBefore(confirmationDiv, bookActions);
+    if (bookActions) {
+        bookCard.insertBefore(confirmationDiv, bookActions);
+    }
 }
 
 async function confirmRemoveFromWatchlist(watchlistId, bookId) {
@@ -821,7 +825,9 @@ async function confirmRemoveFromWatchlist(watchlistId, bookId) {
 }
 
 function cancelRemoveFromWatchlist(bookId) {
-    const bookCard = document.querySelector(`[data-book-id="${bookId}"]`);
+    const modal = document.getElementById('bookModal');
+    const bookCard = modal.querySelector(`.watchlist-book-card[data-book-id="${bookId}"]`);
+    
     if (!bookCard) return;
 
     const confirmation = bookCard.querySelector('.delete-confirmation');
